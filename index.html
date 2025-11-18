@@ -1,0 +1,2352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reyatsotella Community Centre</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#BF151B">
+    <meta name="description" content="Reyatsotella Community Centre - Stay connected with your community">
+    <meta name="keywords" content="community centre, announcements, events, messaging">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="icons/icon-192x192.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <style>
+        /* Reya Tsotella Community Centre - Complete App Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-red: #BF151B;
+            --dark-blue-grey: #303F4B;
+            --light-grey: #F7F9FA;
+            --white: #FFFFFF;
+            --text-dark: #2C3E50;
+            --border-color: #E1E8ED;
+            --success-green: #28A745;
+            --warning-orange: #FD7E14;
+            --error-red: #DC3545;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--light-grey);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+        
+        /* Loading Screen */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-red) 0%, #a81218 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            flex-direction: column;
+            color: white;
+        }
+        
+        #loading-screen img {
+            height: 100px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+        }
+        
+        #loading-screen h2 {
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        #loading-screen p {
+            margin: 10px 0 0 0;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-top: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* App Header */
+        .app-header {
+            background: linear-gradient(135deg, var(--primary-red) 0%, #a81218 100%);
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header-logo {
+            height: 50px;
+            width: 50px;
+            border-radius: 8px;
+            background: white;
+            padding: 5px;
+        }
+        
+        .header-title h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .header-title p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info {
+            text-align: right;
+            font-size: 0.9rem;
+        }
+        
+        .user-role {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-left: 5px;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background: var(--primary-red);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #a81218;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .btn-success {
+            background: var(--success-green);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning-orange);
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+        
+        /* Auth Screen */
+        .auth-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-red) 0%, #a81218 100%);
+        }
+        
+        .auth-container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .auth-logo {
+            height: 80px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+        }
+        
+        .auth-header h2 {
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+        
+        .auth-header p {
+            color: #6C757D;
+            font-size: 0.95rem;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            background: var(--light-grey);
+            padding: 4px;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+        }
+        
+        .auth-tab.active {
+            background: white;
+            color: var(--primary-red);
+            box-shadow: 0 2px 8px rgba(191, 21, 27, 0.2);
+        }
+        
+        .auth-form {
+            display: none;
+        }
+        
+        .auth-form.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-red);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        /* Main App */
+        .main-content {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding-bottom: 100px;
+        }
+        
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .section-header h2 {
+            color: var(--text-dark);
+            font-size: 1.5rem;
+        }
+        
+        .search-box {
+            position: relative;
+            max-width: 300px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 45px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6C757D;
+        }
+        
+        /* Content Lists */
+        .content-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .content-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        
+        .content-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .content-meta {
+            flex: 1;
+        }
+        
+        .content-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+        
+        .content-info {
+            font-size: 0.85rem;
+            color: #6C757D;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .content-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .content-body {
+            color: var(--text-dark);
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        /* Comments Section */
+        .comments-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .comments-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .comments-title {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .comment-form {
+            background: var(--light-grey);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .comment {
+            background: white;
+            border-left: 3px solid var(--primary-red);
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .comment-author {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+        }
+        
+        .comment-text {
+            color: var(--text-dark);
+            margin: 5px 0;
+        }
+        
+        .comment-time {
+            font-size: 0.8rem;
+            color: #6C757D;
+        }
+        
+        .pending-comment {
+            opacity: 0.7;
+            border-left-color: var(--warning-orange);
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            padding: 8px 0;
+            z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 4px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: #6C757D;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 11px;
+        }
+        
+        .nav-item.active {
+            color: var(--primary-red);
+        }
+        
+        .nav-item i {
+            margin-bottom: 4px;
+            font-size: 20px;
+        }
+        
+        /* Form Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            color: var(--text-dark);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6C757D;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Status Indicators */
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-online {
+            background: #D4EDDA;
+            color: #155724;
+        }
+        
+        .status-offline {
+            background: #F8D7DA;
+            color: #721C24;
+        }
+        
+        .status-sync {
+            background: #D1ECF1;
+            color: #0C5460;
+        }
+        
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: var(--primary-red);
+            color: white;
+        }
+        
+        .badge-success {
+            background: var(--success-green);
+        }
+        
+        .badge-warning {
+            background: var(--warning-orange);
+        }
+        
+        /* Message Styles */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .alert-success {
+            background: #D4EDDA;
+            color: #155724;
+            border: 1px solid #C3E6CB;
+        }
+        
+        .alert-error {
+            background: #F8D7DA;
+            color: #721C24;
+            border: 1px solid #F5C6CB;
+        }
+        
+        .alert-warning {
+            background: #FFF3CD;
+            color: #856404;
+            border: 1px solid #FFEAA7;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .auth-container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                max-width: none;
+            }
+            
+            .modal-content {
+                margin: 20px;
+                padding: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .content-card {
+                padding: 15px;
+            }
+            
+            .nav-item span {
+                display: none;
+            }
+            
+            .nav-item i {
+                margin-bottom: 0;
+            }
+        }
+        
+        /* Custom Styles for Enhanced Features */
+        .membership-card {
+            background: linear-gradient(135deg, var(--primary-red) 0%, #a81218 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .membership-card h4 {
+            margin: 0 0 10px 0;
+        }
+        
+        .membership-card .member-info {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .comment-moderation {
+            background: #FFF3CD;
+            border: 1px solid #FFEAA7;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <img src="logo.png" alt="Reyatsotella" onerror="this.style.display='none'">
+        <h2>Reyatsotella Community Centre</h2>
+        <p>Loading your community app...</p>
+        <div class="loading-spinner"></div>
+    </div>
+    
+    <!-- Main App Container -->
+    <div id="app" style="display: none;">
+        <!-- Navigation Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <img src="logo.png" alt="Reyatsotella" class="header-logo" onerror="this.style.display='none'">
+                    <div class="header-title">
+                        <h1>Reyatsotella</h1>
+                        <p>Community Centre</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="user-info" id="user-info" style="display: none;">
+                        <span id="user-name"></span>
+                        <span id="user-role" class="user-role"></span>
+                    </div>
+                    <button id="logout-btn" class="btn btn-secondary btn-sm" style="display: none;">
+                        <i data-lucide="log-out"></i>
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Login/Registration Screen -->
+        <div id="auth-screen" class="auth-screen" style="display: none;">
+            <div class="auth-container">
+                <div class="auth-header">
+                    <img src="logo.png" alt="Reyatsotella" class="auth-logo" onerror="this.style.display='none'">
+                    <h2>Welcome to Reyatsotella Community Centre</h2>
+                    <p>Connect with your community - stay updated on announcements, events, and more</p>
+                </div>
+
+                <!-- Auth Tabs -->
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-tab="member-login">Member Login</button>
+                    <button class="auth-tab" data-tab="admin-login">Admin Login</button>
+                    <button class="auth-tab" data-tab="register">Register</button>
+                </div>
+
+                <!-- Member Login Form -->
+                <div id="member-login" class="auth-form active">
+                    <h3>Member Login</h3>
+                    <form id="member-login-form">
+                        <div class="form-group">
+                            <label for="member-membership-number">Membership Number</label>
+                            <input type="text" id="member-membership-number" placeholder="e.g., REYA001" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="member-phone">Phone Number</label>
+                            <input type="tel" id="member-phone" placeholder="e.g., 0721234567" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Login as Member</button>
+                    </form>
+                </div>
+
+                <!-- Admin Login Form -->
+                <div id="admin-login" class="auth-form">
+                    <h3>Admin Login</h3>
+                    <form id="admin-login-form">
+                        <div class="form-group">
+                            <label for="admin-username">Username</label>
+                            <input type="text" id="admin-username" placeholder="Enter admin username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="admin-password">Password</label>
+                            <input type="password" id="admin-password" placeholder="Enter password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Login as Admin</button>
+                        <div style="margin-top: 15px; font-size: 0.85rem; color: #6C757D;">
+                            <strong>Default Admin:</strong><br>
+                            Username: reyatsotella-admin<br>
+                            Password: Reyatsotella2025!
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Registration Form -->
+                <div id="register" class="auth-form">
+                    <h3>Member Registration</h3>
+                    <form id="register-form">
+                        <div class="form-group">
+                            <label for="reg-name">Full Name *</label>
+                            <input type="text" id="reg-name" placeholder="Enter your full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-membership-number">Membership Number *</label>
+                            <input type="text" id="reg-membership-number" placeholder="e.g., REYA001" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-phone">Phone Number *</label>
+                            <input type="tel" id="reg-phone" placeholder="e.g., 0721234567" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-address">Address</label>
+                            <textarea id="reg-address" placeholder="Enter your address"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-emergency">Emergency Contact</label>
+                            <input type="text" id="reg-emergency" placeholder="Name and phone of emergency contact">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Register</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App Content -->
+        <div id="main-app" style="display: none;">
+            <!-- Bottom Navigation -->
+            <nav class="bottom-nav">
+                <button class="nav-item active" data-section="announcements">
+                    <i data-lucide="megaphone"></i>
+                    <span>Announcements</span>
+                </button>
+                <button class="nav-item" data-section="events">
+                    <i data-lucide="calendar"></i>
+                    <span>Events</span>
+                </button>
+                <button class="nav-item" data-section="messages">
+                    <i data-lucide="message-circle"></i>
+                    <span>Messages</span>
+                </button>
+                <button class="nav-item" data-section="directory">
+                    <i data-lucide="users"></i>
+                    <span>Directory</span>
+                </button>
+                <button class="nav-item" data-section="documents">
+                    <i data-lucide="file-text"></i>
+                    <span>Documents</span>
+                </button>
+            </nav>
+
+            <!-- Content Sections -->
+            <main class="main-content">
+                <!-- Announcements Section -->
+                <section id="announcements" class="content-section active">
+                    <div class="section-header">
+                        <h2>Announcements</h2>
+                        <button id="new-announcement-btn" class="btn btn-primary" style="display: none;">
+                            <i data-lucide="plus"></i>
+                            New Announcement
+                        </button>
+                    </div>
+                    <div id="announcements-list" class="content-list">
+                        <!-- Announcements will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Events Section -->
+                <section id="events" class="content-section">
+                    <div class="section-header">
+                        <h2>Events</h2>
+                        <button id="new-event-btn" class="btn btn-primary" style="display: none;">
+                            <i data-lucide="plus"></i>
+                            New Event
+                        </button>
+                    </div>
+                    <div id="events-list" class="content-list">
+                        <!-- Events will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Messages Section -->
+                <section id="messages" class="content-section">
+                    <div class="section-header">
+                        <h2>Messages</h2>
+                        <button id="new-message-btn" class="btn btn-primary" style="display: none;">
+                            <i data-lucide="plus"></i>
+                            New Message
+                        </button>
+                    </div>
+                    <div id="messages-list" class="content-list">
+                        <!-- Messages will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Directory Section -->
+                <section id="directory" class="content-section">
+                    <div class="section-header">
+                        <h2>Member Directory</h2>
+                        <div class="search-box">
+                            <input type="text" id="member-search" placeholder="Search members...">
+                            <i data-lucide="search"></i>
+                        </div>
+                    </div>
+                    <div id="directory-list" class="content-list">
+                        <!-- Members will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Documents Section -->
+                <section id="documents" class="content-section">
+                    <div class="section-header">
+                        <h2>Documents</h2>
+                        <button id="new-document-btn" class="btn btn-primary" style="display: none;">
+                            <i data-lucide="plus"></i>
+                            Upload Document
+                        </button>
+                    </div>
+                    <div id="documents-list" class="content-list">
+                        <!-- Documents will be loaded here -->
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- New Announcement Modal -->
+    <div id="announcement-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create New Announcement</h3>
+                <button class="close-btn" onclick="closeModal('announcement-modal')">&times;</button>
+            </div>
+            <form id="announcement-form">
+                <div class="form-group">
+                    <label for="announcement-title">Title</label>
+                    <input type="text" id="announcement-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="announcement-content">Content</label>
+                    <textarea id="announcement-content" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="announcement-priority">Priority</label>
+                    <select id="announcement-priority">
+                        <option value="normal">Normal</option>
+                        <option value="high">High Priority</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Create Announcement</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Event Modal -->
+    <div id="event-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create New Event</h3>
+                <button class="close-btn" onclick="closeModal('event-modal')">&times;</button>
+            </div>
+            <form id="event-form">
+                <div class="form-group">
+                    <label for="event-title">Event Title</label>
+                    <input type="text" id="event-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="event-description">Description</label>
+                    <textarea id="event-description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="event-date">Date</label>
+                    <input type="date" id="event-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="event-time">Time</label>
+                    <input type="time" id="event-time" required>
+                </div>
+                <div class="form-group">
+                    <label for="event-location">Location</label>
+                    <input type="text" id="event-location" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Create Event</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Message Modal -->
+    <div id="message-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Send Message</h3>
+                <button class="close-btn" onclick="closeModal('message-modal')">&times;</button>
+            </div>
+            <form id="message-form">
+                <div class="form-group">
+                    <label for="message-title">Message Title</label>
+                    <input type="text" id="message-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="message-content">Message Content</label>
+                    <textarea id="message-content" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Document Upload Modal -->
+    <div id="document-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Upload Document</h3>
+                <button class="close-btn" onclick="closeModal('document-modal')">&times;</button>
+            </div>
+            <form id="document-form">
+                <div class="form-group">
+                    <label for="document-title">Document Title</label>
+                    <input type="text" id="document-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="document-description">Description</label>
+                    <textarea id="document-description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="document-file">File</label>
+                    <input type="file" id="document-file" accept=".pdf,.doc,.docx,.txt" required>
+                    <small>Supported formats: PDF, DOC, DOCX, TXT</small>
+                </div>
+                <button type="submit" class="btn btn-primary">Upload Document</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Reya Tsotella Community Centre - Enhanced Member & Admin System
+        class CommunitySystem {
+            constructor() {
+                // Member database (stored locally)
+                this.members = JSON.parse(localStorage.getItem('reyacommunity_members') || '[]');
+                this.admins = JSON.parse(localStorage.getItem('reyacommunity_admins') || '[]');
+                
+                // Initialize default admin if none exists
+                if (this.admins.length === 0) {
+                    this.admins = [{
+                        id: 'main-admin',
+                        username: 'reyatsotella-admin',
+                        password: 'Reyatsotella2025!', // CHANGE THIS PASSWORD
+                        role: 'Administrator',
+                        permissions: {
+                            postAnnouncements: true,
+                            createEvents: true,
+                            sendMessages: true,
+                            manageMembers: true,
+                            uploadDocuments: true,
+                            uploadPhotos: true,
+                            deleteContent: false,
+                            moderateComments: true
+                        }
+                    }];
+                    this.saveAdmins();
+                }
+                
+                this.currentUser = null;
+                this.isLoggedIn = false;
+                this.loginAttempts = 0;
+                this.maxLoginAttempts = 3;
+                this.lockoutDuration = 15 * 60 * 1000; // 15 minutes
+                
+                // Initialize sample data
+                this.initializeSampleData();
+            }
+            
+            // Save functions
+            saveMembers() {
+                localStorage.setItem('reyacommunity_members', JSON.stringify(this.members));
+            }
+            
+            saveAdmins() {
+                localStorage.setItem('reyacommunity_admins', JSON.stringify(this.admins));
+            }
+            
+            // Member registration
+            registerMember(memberData) {
+                // Validate required fields
+                if (!memberData.name || !memberData.phone || !memberData.membership_number) {
+                    return { success: false, message: 'Name, phone, and membership number are required' };
+                }
+                
+                // Check if membership number already exists
+                if (this.members.find(m => m.membership_number === memberData.membership_number)) {
+                    return { success: false, message: 'Membership number already exists' };
+                }
+                
+                // Check if phone already registered
+                if (this.members.find(m => m.phone === memberData.phone)) {
+                    return { success: false, message: 'Phone number already registered' };
+                }
+                
+                // Create new member
+                const newMember = {
+                    id: 'member_' + Date.now(),
+                    name: memberData.name.trim(),
+                    phone: memberData.phone.trim(),
+                    membership_number: memberData.membership_number.trim(),
+                    address: memberData.address || '',
+                    emergency_contact: memberData.emergency_contact || '',
+                    join_date: new Date().toISOString(),
+                    is_active: true,
+                    last_login: null
+                };
+                
+                this.members.push(newMember);
+                this.saveMembers();
+                
+                return { 
+                    success: true, 
+                    message: 'Registration successful! You can now login.',
+                    member: newMember
+                };
+            }
+            
+            // Member login
+            loginMember(credentials) {
+                const { membership_number, phone } = credentials;
+                
+                if (!membership_number || !phone) {
+                    return { success: false, message: 'Membership number and phone are required' };
+                }
+                
+                const member = this.members.find(m => 
+                    m.membership_number === membership_number && m.phone === phone
+                );
+                
+                if (!member) {
+                    return { success: false, message: 'Invalid credentials' };
+                }
+                
+                if (!member.is_active) {
+                    return { success: false, message: 'Account is inactive. Contact admin.' };
+                }
+                
+                // Update last login
+                member.last_login = new Date().toISOString();
+                this.saveMembers();
+                
+                this.currentUser = {
+                    id: member.id,
+                    name: member.name,
+                    role: 'Member',
+                    membership_number: member.membership_number,
+                    phone: member.phone
+                };
+                this.isLoggedIn = true;
+                
+                return { success: true, message: 'Login successful!', user: this.currentUser };
+            }
+            
+            // Admin login
+            loginAdmin(credentials) {
+                const { username, password } = credentials;
+                
+                if (!username || !password) {
+                    return { success: false, message: 'Username and password are required' };
+                }
+                
+                // Check lockout
+                const failedAttempts = JSON.parse(localStorage.getItem('failed_login_attempts') || '{}');
+                if (failedAttempts[username] >= this.maxLoginAttempts) {
+                    const lastAttempt = failedAttempts[username + '_time'];
+                    if (lastAttempt && (Date.now() - lastAttempt) < this.lockoutDuration) {
+                        return { 
+                            success: false, 
+                            message: 'Account locked. Try again in 15 minutes.' 
+                        };
+                    }
+                }
+                
+                const admin = this.admins.find(a => 
+                    a.username === username && a.password === password
+                );
+                
+                if (!admin) {
+                    // Record failed attempt
+                    failedAttempts[username] = (failedAttempts[username] || 0) + 1;
+                    failedAttempts[username + '_time'] = Date.now();
+                    localStorage.setItem('failed_login_attempts', JSON.stringify(failedAttempts));
+                    
+                    return { success: false, message: 'Invalid username or password' };
+                }
+                
+                // Clear failed attempts on successful login
+                delete failedAttempts[username];
+                delete failedAttempts[username + '_time'];
+                localStorage.setItem('failed_login_attempts', JSON.stringify(failedAttempts));
+                
+                this.currentUser = {
+                    id: admin.id,
+                    name: admin.username,
+                    role: admin.role,
+                    permissions: admin.permissions
+                };
+                this.isLoggedIn = true;
+                
+                return { success: true, message: 'Login successful!', user: this.currentUser };
+            }
+            
+            // Logout
+            logout() {
+                this.currentUser = null;
+                this.isLoggedIn = false;
+                localStorage.removeItem('current_user');
+            }
+            
+            // Get current user
+            getCurrentUser() {
+                if (!this.currentUser) {
+                    const saved = localStorage.getItem('current_user');
+                    if (saved) {
+                        this.currentUser = JSON.parse(saved);
+                        this.isLoggedIn = true;
+                    }
+                }
+                return this.currentUser;
+            }
+            
+            // Save current user session
+            saveCurrentUser(user) {
+                this.currentUser = user;
+                this.isLoggedIn = true;
+                localStorage.setItem('current_user', JSON.stringify(user));
+            }
+            
+            // Check if user has permission
+            hasPermission(permission) {
+                const user = this.getCurrentUser();
+                if (!user) return false;
+                
+                if (user.role === 'Administrator') return true;
+                if (user.role === 'Member') return false; // Members don't have admin permissions
+                
+                // Check specific admin permission
+                return user.permissions && user.permissions[permission];
+            }
+            
+            // Get all members (admin only)
+            getAllMembers() {
+                const user = this.getCurrentUser();
+                if (!user || user.role !== 'Administrator') {
+                    return [];
+                }
+                return this.members;
+            }
+            
+            // Get member info (for display - limited info)
+            getMemberDisplayInfo(memberId) {
+                const member = this.members.find(m => m.id === memberId);
+                if (!member) return null;
+                
+                return {
+                    id: member.id,
+                    name: member.name,
+                    membership_number: member.membership_number
+                };
+            }
+            
+            // Deactivate member (admin only)
+            deactivateMember(memberId) {
+                const member = this.members.find(m => m.id === memberId);
+                if (member) {
+                    member.is_active = false;
+                    this.saveMembers();
+                    return true;
+                }
+                return false;
+            }
+            
+            // Activate member (admin only)
+            activateMember(memberId) {
+                const member = this.members.find(m => m.id === memberId);
+                if (member) {
+                    member.is_active = true;
+                    this.saveMembers();
+                    return true;
+                }
+                return false;
+            }
+            
+            // Add comment to content
+            addComment(contentId, comment) {
+                const user = this.getCurrentUser();
+                if (!user) return { success: false, message: 'Must be logged in to comment' };
+                
+                const commentData = {
+                    id: 'comment_' + Date.now(),
+                    content_id: contentId,
+                    author_id: user.id,
+                    author_name: user.name,
+                    comment: comment.trim(),
+                    timestamp: new Date().toISOString(),
+                    is_approved: user.role === 'Administrator' // Auto-approve admin comments
+                };
+                
+                const comments = this.getComments(contentId);
+                comments.push(commentData);
+                this.saveComments(contentId, comments);
+                
+                return { success: true, message: 'Comment added successfully!' };
+            }
+            
+            // Get comments for content
+            getComments(contentId) {
+                return JSON.parse(localStorage.getItem(`comments_${contentId}`) || '[]');
+            }
+            
+            // Save comments for content
+            saveComments(contentId, comments) {
+                localStorage.setItem(`comments_${contentId}`, JSON.stringify(comments));
+            }
+            
+            // Approve comment (admin only)
+            approveComment(contentId, commentId) {
+                const user = this.getCurrentUser();
+                if (user?.role !== 'Administrator') return false;
+                
+                const comments = this.getComments(contentId);
+                const comment = comments.find(c => c.id === commentId);
+                if (comment) {
+                    comment.is_approved = true;
+                    this.saveComments(contentId, comments);
+                    return true;
+                }
+                return false;
+            }
+            
+            // Delete comment (admin only)
+            deleteComment(contentId, commentId) {
+                const user = this.getCurrentUser();
+                if (user?.role !== 'Administrator') return false;
+                
+                const comments = this.getComments(contentId);
+                const filteredComments = comments.filter(c => c.id !== commentId);
+                this.saveComments(contentId, filteredComments);
+                return true;
+            }
+            
+            // Get pending comments count (admin only)
+            getPendingCommentsCount() {
+                const user = this.getCurrentUser();
+                if (user?.role !== 'Administrator') return 0;
+                
+                let pendingCount = 0;
+                const keys = Object.keys(localStorage);
+                keys.forEach(key => {
+                    if (key.startsWith('comments_')) {
+                        const comments = JSON.parse(localStorage.getItem(key) || '[]');
+                        pendingCount += comments.filter(c => !c.is_approved).length;
+                    }
+                });
+                return pendingCount;
+            }
+            
+            // Initialize sample data for demo
+            initializeSampleData() {
+                if (this.members.length === 0) {
+                    const sampleMembers = [
+                        {
+                            id: 'member_1',
+                            name: 'John Smith',
+                            phone: '0721234567',
+                            membership_number: 'REYA001',
+                            address: '123 Main Street',
+                            emergency_contact: 'Jane Smith - 0727654321',
+                            join_date: '2024-01-15T00:00:00.000Z',
+                            is_active: true,
+                            last_login: null
+                        },
+                        {
+                            id: 'member_2',
+                            name: 'Mary Johnson',
+                            phone: '0722345678',
+                            membership_number: 'REYA002',
+                            address: '456 Oak Avenue',
+                            emergency_contact: 'Tom Johnson - 0728765432',
+                            join_date: '2024-02-01T00:00:00.000Z',
+                            is_active: true,
+                            last_login: null
+                        }
+                    ];
+                    
+                    this.members = sampleMembers;
+                    this.saveMembers();
+                }
+            }
+        }
+
+        // Enhanced Community App
+        class EnhancedCommunityApp {
+            constructor() {
+                this.community = new CommunitySystem();
+                this.currentSection = 'announcements';
+                this.offlineQueue = JSON.parse(localStorage.getItem('offline_queue') || '[]');
+                this.isOnline = navigator.onLine;
+                this.serviceWorkerRegistration = null;
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupEventListeners();
+                this.registerServiceWorker();
+                this.loadCurrentUser();
+                this.setupNetworkStatus();
+                this.initializeContent();
+                this.initializeApp();
+            }
+            
+            // Initialize the app after loading
+            initializeApp() {
+                setTimeout(() => {
+                    document.getElementById('loading-screen').style.display = 'none';
+                    document.getElementById('app').style.display = 'block';
+                    
+                    const currentUser = this.community.getCurrentUser();
+                    if (currentUser) {
+                        this.showMainApp();
+                    } else {
+                        this.showAuthScreen();
+                    }
+                }, 1000);
+            }
+            
+            // Setup event listeners
+            setupEventListeners() {
+                // Auth tab switching
+                document.querySelectorAll('.auth-tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        this.switchAuthTab(e.target.dataset.tab);
+                    });
+                });
+                
+                // Form submissions
+                document.getElementById('member-login-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.loginMember();
+                });
+                
+                document.getElementById('admin-login-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.loginAdmin();
+                });
+                
+                document.getElementById('register-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.registerMember();
+                });
+                
+                // Content forms
+                document.getElementById('announcement-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.createAnnouncement();
+                });
+                
+                document.getElementById('event-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.createEvent();
+                });
+                
+                document.getElementById('message-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.createMessage();
+                });
+                
+                document.getElementById('document-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.uploadDocument();
+                });
+                
+                // Navigation
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        this.switchSection(e.target.closest('.nav-item').dataset.section);
+                    });
+                });
+                
+                // Search
+                document.getElementById('member-search').addEventListener('input', (e) => {
+                    this.searchMembers(e.target.value);
+                });
+                
+                // Logout
+                document.getElementById('logout-btn').addEventListener('click', () => {
+                    this.logout();
+                });
+            }
+            
+            // Initialize content with sample data
+            initializeContent() {
+                // Initialize announcements if none exist
+                let announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+                if (announcements.length === 0) {
+                    announcements = [
+                        {
+                            id: 'announcement_1',
+                            title: 'Welcome to Reya Tsotella Community Centre!',
+                            content: 'We are excited to launch our new community app. This platform will help us stay connected and share important updates. Please register and login to access all features.',
+                            author: 'Admin Team',
+                            timestamp: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+                            priority: 'normal'
+                        },
+                        {
+                            id: 'announcement_2',
+                            title: 'Community Meeting Scheduled',
+                            content: 'Our monthly community meeting is scheduled for next Friday at 2:00 PM. All members are encouraged to attend and share their ideas for community improvement.',
+                            author: 'Admin Team',
+                            timestamp: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+                            priority: 'high'
+                        }
+                    ];
+                    localStorage.setItem('announcements', JSON.stringify(announcements));
+                }
+                
+                // Initialize events if none exist
+                let events = JSON.parse(localStorage.getItem('events') || '[]');
+                if (events.length === 0) {
+                    events = [
+                        {
+                            id: 'event_1',
+                            title: 'Community Clean-up Drive',
+                            description: 'Join us for a community clean-up initiative to improve our neighborhood. We will provide cleaning materials and refreshments.',
+                            date: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0], // 3 days from now
+                            time: '09:00',
+                            location: 'Community Centre Grounds',
+                            author: 'Events Team',
+                            timestamp: new Date().toISOString()
+                        }
+                    ];
+                    localStorage.setItem('events', JSON.stringify(events));
+                }
+                
+                // Initialize messages if none exist
+                let messages = JSON.parse(localStorage.getItem('messages') || '[]');
+                if (messages.length === 0) {
+                    messages = [
+                        {
+                            id: 'message_1',
+                            title: 'Thank You for Your Support',
+                            content: 'Thank you to all members who contributed to our recent fundraising event. Your generosity helps us continue serving our community.',
+                            author: 'Admin Team',
+                            timestamp: new Date(Date.now() - 7200000).toISOString() // 2 hours ago
+                        }
+                    ];
+                    localStorage.setItem('messages', JSON.stringify(messages));
+                }
+            }
+            
+            // Load current user session
+            loadCurrentUser() {
+                const currentUser = this.community.getCurrentUser();
+                if (currentUser) {
+                    this.updateUserInterface(currentUser);
+                }
+            }
+            
+            // Show auth screen
+            showAuthScreen() {
+                document.getElementById('auth-screen').style.display = 'flex';
+                document.getElementById('main-app').style.display = 'none';
+                document.getElementById('user-info').style.display = 'none';
+                document.getElementById('logout-btn').style.display = 'none';
+            }
+            
+            // Show main app
+            showMainApp() {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+                
+                const currentUser = this.community.getCurrentUser();
+                this.updateUserInterface(currentUser);
+                this.loadContent();
+                this.toggleAdminButtons();
+            }
+            
+            // Update user interface
+            updateUserInterface(user) {
+                if (user) {
+                    document.getElementById('user-info').style.display = 'block';
+                    document.getElementById('logout-btn').style.display = 'flex';
+                    document.getElementById('user-name').textContent = user.name;
+                    document.getElementById('user-role').textContent = user.role;
+                }
+            }
+            
+            // Toggle admin buttons based on permissions
+            toggleAdminButtons() {
+                const currentUser = this.community.getCurrentUser();
+                const adminButtons = [
+                    'new-announcement-btn',
+                    'new-event-btn',
+                    'new-message-btn',
+                    'new-document-btn'
+                ];
+                
+                if (currentUser && currentUser.role === 'Administrator') {
+                    adminButtons.forEach(id => {
+                        document.getElementById(id).style.display = 'inline-flex';
+                    });
+                } else {
+                    adminButtons.forEach(id => {
+                        document.getElementById(id).style.display = 'none';
+                    });
+                }
+            }
+            
+            // Switch auth tab
+            switchAuthTab(tabName) {
+                // Update tab buttons
+                document.querySelectorAll('.auth-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+                
+                // Update forms
+                document.querySelectorAll('.auth-form').forEach(form => {
+                    form.classList.remove('active');
+                });
+                document.getElementById(tabName).classList.add('active');
+            }
+            
+            // Member registration
+            registerMember() {
+                const formData = {
+                    name: document.getElementById('reg-name').value,
+                    membership_number: document.getElementById('reg-membership-number').value,
+                    phone: document.getElementById('reg-phone').value,
+                    address: document.getElementById('reg-address').value,
+                    emergency_contact: document.getElementById('reg-emergency').value
+                };
+                
+                const result = this.community.registerMember(formData);
+                this.showMessage(result.message, result.success ? 'success' : 'error');
+                
+                if (result.success) {
+                    document.getElementById('register-form').reset();
+                    this.switchAuthTab('member-login');
+                }
+            }
+            
+            // Member login
+            loginMember() {
+                const credentials = {
+                    membership_number: document.getElementById('member-membership-number').value,
+                    phone: document.getElementById('member-phone').value
+                };
+                
+                const result = this.community.loginMember(credentials);
+                this.showMessage(result.message, result.success ? 'success' : 'error');
+                
+                if (result.success) {
+                    this.community.saveCurrentUser(result.user);
+                    this.showMainApp();
+                }
+            }
+            
+            // Admin login
+            loginAdmin() {
+                const credentials = {
+                    username: document.getElementById('admin-username').value,
+                    password: document.getElementById('admin-password').value
+                };
+                
+                const result = this.community.loginAdmin(credentials);
+                this.showMessage(result.message, result.success ? 'success' : 'error');
+                
+                if (result.success) {
+                    this.community.saveCurrentUser(result.user);
+                    this.showMainApp();
+                }
+            }
+            
+            // Logout
+            logout() {
+                this.community.logout();
+                this.showAuthScreen();
+            }
+            
+            // Switch content section
+            switchSection(sectionName) {
+                // Update navigation
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelector(`[data-section="${sectionName}"]`).classList.add('active');
+                
+                // Update content
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(sectionName).classList.add('active');
+                
+                this.currentSection = sectionName;
+                this.loadContent();
+            }
+            
+            // Load content based on current section
+            loadContent() {
+                switch (this.currentSection) {
+                    case 'announcements':
+                        this.loadAnnouncements();
+                        break;
+                    case 'events':
+                        this.loadEvents();
+                        break;
+                    case 'messages':
+                        this.loadMessages();
+                        break;
+                    case 'directory':
+                        this.loadMemberDirectory();
+                        break;
+                    case 'documents':
+                        this.loadDocuments();
+                        break;
+                }
+            }
+            
+            // Load announcements
+            loadAnnouncements() {
+                const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+                const container = document.getElementById('announcements-list');
+                container.innerHTML = '';
+                
+                announcements.forEach(announcement => {
+                    const card = this.createContentCard(announcement, 'announcement');
+                    container.appendChild(card);
+                });
+            }
+            
+            // Load events
+            loadEvents() {
+                const events = JSON.parse(localStorage.getItem('events') || '[]');
+                const container = document.getElementById('events-list');
+                container.innerHTML = '';
+                
+                events.forEach(event => {
+                    const card = this.createEventCard(event);
+                    container.appendChild(card);
+                });
+            }
+            
+            // Load messages
+            loadMessages() {
+                const messages = JSON.parse(localStorage.getItem('messages') || '[]');
+                const container = document.getElementById('messages-list');
+                container.innerHTML = '';
+                
+                messages.forEach(message => {
+                    const card = this.createContentCard(message, 'message');
+                    container.appendChild(card);
+                });
+            }
+            
+            // Load member directory
+            loadMemberDirectory() {
+                const currentUser = this.community.getCurrentUser();
+                let members = this.community.getAllMembers();
+                
+                // If not admin, show limited member info
+                if (currentUser?.role !== 'Administrator') {
+                    members = members.map(member => ({
+                        id: member.id,
+                        name: member.name,
+                        membership_number: member.membership_number,
+                        join_date: member.join_date
+                    }));
+                }
+                
+                const container = document.getElementById('directory-list');
+                container.innerHTML = '';
+                
+                members.forEach(member => {
+                    const card = this.createMemberCard(member, currentUser?.role === 'Administrator');
+                    container.appendChild(card);
+                });
+            }
+            
+            // Load documents
+            loadDocuments() {
+                const documents = JSON.parse(localStorage.getItem('documents') || '[]');
+                const container = document.getElementById('documents-list');
+                container.innerHTML = '';
+                
+                documents.forEach(document => {
+                    const card = this.createDocumentCard(document);
+                    container.appendChild(card);
+                });
+            }
+            
+            // Create content card (for announcements and messages)
+            createContentCard(content, type) {
+                const card = document.createElement('div');
+                card.className = 'content-card';
+                
+                const date = new Date(content.timestamp);
+                const timeString = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                const priorityClass = content.priority === 'urgent' ? 'badge-warning' : 
+                                     content.priority === 'high' ? 'badge-warning' : 'badge-success';
+                
+                card.innerHTML = `
+                    <div class="content-header">
+                        <div class="content-meta">
+                            <div class="content-title">${content.title}</div>
+                            <div class="content-info">
+                                <span>By ${content.author}</span>
+                                <span>${timeString}</span>
+                                ${content.priority ? `<span class="badge ${priorityClass}">${content.priority.toUpperCase()}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="content-actions">
+                            ${this.community.hasPermission('moderateComments') ? 
+                                `<button class="btn btn-sm btn-secondary" onclick="app.manageComments('${content.id}', '${type}')">
+                                    <i data-lucide="message-square"></i> Comments
+                                </button>` : ''
+                            }
+                        </div>
+                    </div>
+                    <div class="content-body">${content.content}</div>
+                    ${this.showCommentSection(content.id, type)}
+                `;
+                
+                // Initialize comment section
+                setTimeout(() => this.initializeCommentSection(content.id), 0);
+                
+                return card;
+            }
+            
+            // Create event card
+            createEventCard(event) {
+                const card = document.createElement('div');
+                card.className = 'content-card';
+                
+                const eventDate = new Date(event.date);
+                const eventTime = event.time;
+                const dateString = eventDate.toLocaleDateString();
+                
+                card.innerHTML = `
+                    <div class="content-header">
+                        <div class="content-meta">
+                            <div class="content-title">${event.title}</div>
+                            <div class="content-info">
+                                <span>${dateString} at ${eventTime}</span>
+                                <span>${event.location}</span>
+                                <span>By ${event.author}</span>
+                            </div>
+                        </div>
+                        <div class="content-actions">
+                            <button class="btn btn-sm btn-secondary" onclick="app.manageComments('${event.id}', 'event')">
+                                <i data-lucide="message-square"></i> Comments
+                            </button>
+                        </div>
+                    </div>
+                    <div class="content-body">${event.description}</div>
+                    ${this.showCommentSection(event.id, 'event')}
+                `;
+                
+                // Initialize comment section
+                setTimeout(() => this.initializeCommentSection(event.id), 0);
+                
+                return card;
+            }
+            
+            // Create member card
+            createMemberCard(member, isAdmin) {
+                const card = document.createElement('div');
+                card.className = 'content-card';
+                
+                const joinDate = new Date(member.join_date).toLocaleDateString();
+                const status = member.is_active ? 'Active' : 'Inactive';
+                const statusClass = member.is_active ? 'badge-success' : 'badge-warning';
+                
+                card.innerHTML = `
+                    <div class="content-header">
+                        <div class="content-meta">
+                            <div class="content-title">${member.name}</div>
+                            <div class="content-info">
+                                <span>Membership: ${member.membership_number}</span>
+                                <span>Joined: ${joinDate}</span>
+                                <span class="badge ${statusClass}">${status}</span>
+                            </div>
+                        </div>
+                        <div class="content-actions">
+                            ${isAdmin ? `
+                                <button class="btn btn-sm ${member.is_active ? 'btn-warning' : 'btn-success'}" 
+                                        onclick="app.toggleMemberStatus('${member.id}')">
+                                    ${member.is_active ? 'Deactivate' : 'Activate'}
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                    ${isAdmin ? `
+                        <div class="membership-card">
+                            <h4>Contact Information</h4>
+                            <div class="member-info">
+                                <p><strong>Phone:</strong> ${member.phone}</p>
+                                <p><strong>Address:</strong> ${member.address || 'Not provided'}</p>
+                                <p><strong>Emergency Contact:</strong> ${member.emergency_contact || 'Not provided'}</p>
+                            </div>
+                        </div>
+                    ` : ''}
+                `;
+                
+                return card;
+            }
+            
+            // Create document card
+            createDocumentCard(document) {
+                const card = document.createElement('div');
+                card.className = 'content-card';
+                
+                const uploadDate = new Date(document.timestamp).toLocaleDateString();
+                
+                card.innerHTML = `
+                    <div class="content-header">
+                        <div class="content-meta">
+                            <div class="content-title">${document.title}</div>
+                            <div class="content-info">
+                                <span>Uploaded: ${uploadDate}</span>
+                                <span>By ${document.author}</span>
+                            </div>
+                        </div>
+                        <div class="content-actions">
+                            <button class="btn btn-sm btn-primary" onclick="app.downloadDocument('${document.id}')">
+                                <i data-lucide="download"></i> Download
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="app.manageComments('${document.id}', 'document')">
+                                <i data-lucide="message-square"></i> Comments
+                            </button>
+                        </div>
+                    </div>
+                    <div class="content-body">${document.description || 'No description provided'}</div>
+                    ${this.showCommentSection(document.id, 'document')}
+                `;
+                
+                // Initialize comment section
+                setTimeout(() => this.initializeCommentSection(document.id), 0);
+                
+                return card;
+            }
+            
+            // Show comment section
+            showCommentSection(contentId, contentType) {
+                const currentUser = this.community.getCurrentUser();
+                if (!currentUser) return '';
+                
+                return `
+                    <div class="comments-section" id="comments-${contentId}">
+                        <div class="comments-header">
+                            <span class="comments-title">Comments</span>
+                            ${this.community.getCurrentUser()?.role === 'Administrator' ? 
+                                `<span class="badge badge-warning" id="pending-${contentId}"></span>` : ''
+                            }
+                        </div>
+                        <div class="comment-form">
+                            <textarea id="comment-input-${contentId}" placeholder="Add your comment..." rows="3"></textarea>
+                            <button class="btn btn-primary btn-sm" onclick="app.addComment('${contentId}')" style="margin-top: 10px;">
+                                <i data-lucide="send"></i> Post Comment
+                            </button>
+                        </div>
+                        <div id="comments-list-${contentId}">
+                            <!-- Comments will be loaded here -->
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Initialize comment section
+            initializeCommentSection(contentId) {
+                const comments = this.community.getComments(contentId);
+                this.displayComments(contentId, comments);
+                this.updatePendingCommentsCount(contentId);
+                lucide.createIcons();
+            }
+            
+            // Display comments
+            displayComments(contentId, comments) {
+                const container = document.getElementById(`comments-list-${contentId}`);
+                if (!container) return;
+                
+                container.innerHTML = '';
+                
+                // Filter comments based on user role
+                const currentUser = this.community.getCurrentUser();
+                const visibleComments = currentUser?.role === 'Administrator' ? 
+                    comments : comments.filter(c => c.is_approved || c.author_id === currentUser?.id);
+                
+                visibleComments.forEach(comment => {
+                    const commentDiv = document.createElement('div');
+                    commentDiv.className = `comment ${!comment.is_approved && currentUser?.role === 'Administrator' ? 'pending-comment' : ''}`;
+                    
+                    const commentDate = new Date(comment.timestamp);
+                    const timeString = commentDate.toLocaleDateString() + ' ' + commentDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    
+                    commentDiv.innerHTML = `
+                        <div class="comment-author">${comment.author_name}</div>
+                        <div class="comment-text">${comment.comment}</div>
+                        <div class="comment-time">${timeString}</div>
+                        ${currentUser?.role === 'Administrator' && !comment.is_approved ? 
+                            `<div class="comment-moderation">
+                                <button class="btn btn-sm btn-success" onclick="app.approveComment('${contentId}', '${comment.id}')">
+                                    <i data-lucide="check"></i> Approve
+                                </button>
+                                <button class="btn btn-sm btn-warning" onclick="app.deleteComment('${contentId}', '${comment.id}')">
+                                    <i data-lucide="trash"></i> Delete
+                                </button>
+                            </div>` : ''
+                        }
+                    `;
+                    
+                    container.appendChild(commentDiv);
+                });
+            }
+            
+            // Update pending comments count
+            updatePendingCommentsCount(contentId) {
+                const currentUser = this.community.getCurrentUser();
+                if (currentUser?.role !== 'Administrator') return;
+                
+                const comments = this.community.getComments(contentId);
+                const pendingCount = comments.filter(c => !c.is_approved).length;
+                
+                const badge = document.getElementById(`pending-${contentId}`);
+                if (badge) {
+                    badge.textContent = `${pendingCount} pending`;
+                    badge.style.display = pendingCount > 0 ? 'inline-block' : 'none';
+                }
+            }
+            
+            // Add comment
+            addComment(contentId) {
+                const input = document.getElementById(`comment-input-${contentId}`);
+                const commentText = input.value.trim();
+                
+                if (!commentText) {
+                    this.showMessage('Please enter a comment', 'error');
+                    return;
+                }
+                
+                const result = this.community.addComment(contentId, commentText);
+                this.showMessage(result.message, result.success ? 'success' : 'error');
+                
+                if (result.success) {
+                    input.value = '';
+                    const comments = this.community.getComments(contentId);
+                    this.displayComments(contentId, comments);
+                    this.updatePendingCommentsCount(contentId);
+                }
+            }
+            
+            // Approve comment
+            approveComment(contentId, commentId) {
+                const success = this.community.approveComment(contentId, commentId);
+                if (success) {
+                    const comments = this.community.getComments(contentId);
+                    this.displayComments(contentId, comments);
+                    this.updatePendingCommentsCount(contentId);
+                    this.showMessage('Comment approved', 'success');
+                }
+            }
+            
+            // Delete comment
+            deleteComment(contentId, commentId) {
+                if (confirm('Are you sure you want to delete this comment?')) {
+                    const success = this.community.deleteComment(contentId, commentId);
+                    if (success) {
+                        const comments = this.community.getComments(contentId);
+                        this.displayComments(contentId, comments);
+                        this.updatePendingCommentsCount(contentId);
+                        this.showMessage('Comment deleted', 'success');
+                    }
+                }
+            }
+            
+            // Create announcement
+            createAnnouncement() {
+                const title = document.getElementById('announcement-title').value;
+                const content = document.getElementById('announcement-content').value;
+                const priority = document.getElementById('announcement-priority').value;
+                
+                const currentUser = this.community.getCurrentUser();
+                const announcement = {
+                    id: 'announcement_' + Date.now(),
+                    title: title,
+                    content: content,
+                    priority: priority,
+                    author: currentUser.name,
+                    timestamp: new Date().toISOString()
+                };
+                
+                let announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+                announcements.unshift(announcement);
+                localStorage.setItem('announcements', JSON.stringify(announcements));
+                
+                this.showMessage('Announcement created successfully!', 'success');
+                closeModal('announcement-modal');
+                document.getElementById('announcement-form').reset();
+                this.loadAnnouncements();
+            }
+            
+            // Create event
+            createEvent() {
+                const title = document.getElementById('event-title').value;
+                const description = document.getElementById('event-description').value;
+                const date = document.getElementById('event-date').value;
+                const time = document.getElementById('event-time').value;
+                const location = document.getElementById('event-location').value;
+                
+                const currentUser = this.community.getCurrentUser();
+                const event = {
+                    id: 'event_' + Date.now(),
+                    title: title,
+                    description: description,
+                    date: date,
+                    time: time,
+                    location: location,
+                    author: currentUser.name,
+                    timestamp: new Date().toISOString()
+                };
+                
+                let events = JSON.parse(localStorage.getItem('events') || '[]');
+                events.unshift(event);
+                localStorage.setItem('events', JSON.stringify(events));
+                
+                this.showMessage('Event created successfully!', 'success');
+                closeModal('event-modal');
+                document.getElementById('event-form').reset();
+                this.loadEvents();
+            }
+            
+            // Create message
+            createMessage() {
+                const title = document.getElementById('message-title').value;
+                const content = document.getElementById('message-content').value;
+                
+                const currentUser = this.community.getCurrentUser();
+                const message = {
+                    id: 'message_' + Date.now(),
+                    title: title,
+                    content: content,
+                    author: currentUser.name,
+                    timestamp: new Date().toISOString()
+                };
+                
+                let messages = JSON.parse(localStorage.getItem('messages') || '[]');
+                messages.unshift(message);
+                localStorage.setItem('messages', JSON.stringify(messages));
+                
+                this.showMessage('Message sent successfully!', 'success');
+                closeModal('message-modal');
+                document.getElementById('message-form').reset();
+                this.loadMessages();
+            }
+            
+            // Upload document
+            uploadDocument() {
+                const title = document.getElementById('document-title').value;
+                const description = document.getElementById('document-description').value;
+                const fileInput = document.getElementById('document-file');
+                const file = fileInput.files[0];
+                
+                if (!file) {
+                    this.showMessage('Please select a file', 'error');
+                    return;
+                }
+                
+                const currentUser = this.community.getCurrentUser();
+                const document = {
+                    id: 'document_' + Date.now(),
+                    title: title,
+                    description: description,
+                    filename: file.name,
+                    filesize: file.size,
+                    filetype: file.type,
+                    author: currentUser.name,
+                    timestamp: new Date().toISOString()
+                };
+                
+                // Store file info (in a real app, you'd upload to a server)
+                localStorage.setItem(`document_${document.id}`, JSON.stringify({
+                    document: document,
+                    fileData: 'File data would be stored here'
+                }));
+                
+                let documents = JSON.parse(localStorage.getItem('documents') || '[]');
+                documents.unshift(document);
+                localStorage.setItem('documents', JSON.stringify(documents));
+                
+                this.showMessage('Document uploaded successfully!', 'success');
+                closeModal('document-modal');
+                document.getElementById('document-form').reset();
+                this.loadDocuments();
+            }
+            
+            // Toggle member status
+            toggleMemberStatus(memberId) {
+                const member = this.community.members.find(m => m.id === memberId);
+                if (member) {
+                    const action = member.is_active ? 'deactivate' : 'activate';
+                    if (confirm(`Are you sure you want to ${action} this member?`)) {
+                        if (member.is_active) {
+                            this.community.deactivateMember(memberId);
+                        } else {
+                            this.community.activateMember(memberId);
+                        }
+                        this.showMessage(`Member ${action}d successfully!`, 'success');
+                        this.loadMemberDirectory();
+                    }
+                }
+            }
+            
+            // Search members
+            searchMembers(query) {
+                const members = this.community.getAllMembers();
+                const filteredMembers = members.filter(member => 
+                    member.name.toLowerCase().includes(query.toLowerCase()) ||
+                    member.membership_number.toLowerCase().includes(query.toLowerCase())
+                );
+                
+                const container = document.getElementById('directory-list');
+                container.innerHTML = '';
+                
+                const currentUser = this.community.getCurrentUser();
+                filteredMembers.forEach(member => {
+                    const card = this.createMemberCard(member, currentUser?.role === 'Administrator');
+                    container.appendChild(card);
+                });
+            }
+            
+            // Download document
+            downloadDocument(documentId) {
+                this.showMessage('Document download would start here', 'success');
+                // In a real app, this would download the actual file
+            }
+            
+            // Show message
+            showMessage(message, type = 'info') {
+                // Create message element
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `alert alert-${type}`;
+                messageDiv.textContent = message;
+                
+                // Insert at top of main content
+                const mainContent = document.querySelector('.main-content');
+                mainContent.insertBefore(messageDiv, mainContent.firstChild);
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    messageDiv.remove();
+                }, 5000);
+            }
+            
+            // Register service worker for offline functionality
+            async registerServiceWorker() {
+                if ('serviceWorker' in navigator) {
+                    try {
+                        this.serviceWorkerRegistration = await navigator.serviceWorker.register('/sw.js');
+                        console.log('Service Worker registered successfully');
+                    } catch (error) {
+                        console.log('Service Worker registration failed:', error);
+                    }
+                }
+            }
+            
+            // Setup network status monitoring
+            setupNetworkStatus() {
+                window.addEventListener('online', () => {
+                    this.isOnline = true;
+                    this.processOfflineQueue();
+                });
+                
+                window.addEventListener('offline', () => {
+                    this.isOnline = false;
+                });
+            }
+            
+            // Process offline queue when back online
+            processOfflineQueue() {
+                // Process any queued actions
+                console.log('Processing offline queue...');
+                // Implementation would depend on specific offline actions
+            }
+        }
+        
+        // Utility functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        // Initialize the app when DOM is loaded
+        let app;
+        document.addEventListener('DOMContentLoaded', () => {
+            app = new EnhancedCommunityApp();
+            
+            // Add click handlers for new content buttons
+            document.getElementById('new-announcement-btn').addEventListener('click', () => {
+                openModal('announcement-modal');
+            });
+            
+            document.getElementById('new-event-btn').addEventListener('click', () => {
+                openModal('event-modal');
+            });
+            
+            document.getElementById('new-message-btn').addEventListener('click', () => {
+                openModal('message-modal');
+            });
+            
+            document.getElementById('new-document-btn').addEventListener('click', () => {
+                openModal('document-modal');
+            });
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
