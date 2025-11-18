@@ -28,7 +28,7 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
     <style>
-        /* Reya Tsotella Community Centre - Secure App Styles */
+        /* Reya Tsotella Community Centre - Fixed Secure App */
         * {
             margin: 0;
             padding: 0;
@@ -449,15 +449,6 @@
             gap: 1rem;
             margin-top: 1rem;
         }
-        
-        /* Password Change Form */
-        .password-change-section {
-            background: var(--white);
-            border: 2px dashed var(--border-color);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-        }
     </style>
 </head>
 <body>
@@ -521,6 +512,7 @@
         <div id="user-welcome" class="card hidden">
             <h3>Welcome back, <span id="user-name-display"></span>!</h3>
             <p>You're now logged in as a member of our community. Use the tabs above to access different features.</p>
+            <button class="btn btn-danger" onclick="logout()">Logout</button>
         </div>
         
         <div id="admin-welcome" class="card hidden">
@@ -543,6 +535,7 @@
                     </button>
                 </div>
             </div>
+            <button class="btn btn-danger" onclick="logout()">Logout</button>
         </div>
     </div>
 
@@ -772,32 +765,6 @@
             <p>Manage your community centre's digital presence.</p>
         </div>
 
-        <!-- Security Notice -->
-        <div class="security-notice">
-            <h4>🔐 Change Admin Credentials</h4>
-            <p>For security, please change your admin password after first login.</p>
-        </div>
-
-        <!-- Password Change Section -->
-        <div class="password-change-section">
-            <h4>Change Admin Password</h4>
-            <form id="change-password-form">
-                <div class="form-group">
-                    <label for="current-password">Current Password</label>
-                    <input type="password" id="current-password" placeholder="Enter current password" required>
-                </div>
-                <div class="form-group">
-                    <label for="new-password">New Password</label>
-                    <input type="password" id="new-password" placeholder="Enter new password" required>
-                </div>
-                <div class="form-group">
-                    <label for="confirm-password">Confirm New Password</label>
-                    <input type="password" id="confirm-password" placeholder="Confirm new password" required>
-                </div>
-                <button type="submit" class="btn btn-warning">Update Password</button>
-            </form>
-        </div>
-
         <!-- Quick Stats -->
         <div class="admin-settings">
             <h4>Community Statistics</h4>
@@ -828,35 +795,34 @@
                 <button class="btn btn-danger" onclick="clearAllData()">
                     <i data-lucide="trash-2"></i> Clear All Data
                 </button>
-                <button class="btn btn-success" onclick="showFirstTimeSetup()">
-                    <i data-lucide="settings"></i> First Time Setup
-                </button>
             </div>
         </div>
     </div>
 
     <!-- Scripts -->
     <script>
-        // Reya Tsotella Community Centre - Secure App JavaScript
+        // Reya Tsotella Community Centre - Fixed Secure App JavaScript
         class ReyaCommunityApp {
             constructor() {
                 this.currentUser = null;
                 this.isAdmin = false;
-                this.db = null;
+                this.members = [];
+                this.announcements = [];
+                this.events = [];
+                this.messages = [];
+                this.documents = [];
+                this.comments = [];
                 this.init();
             }
 
-            async init() {
+            init() {
                 // Initialize Lucide icons
                 if (typeof lucide !== 'undefined') {
                     lucide.createIcons();
                 }
 
-                // Initialize database
-                await this.initDatabase();
-                
-                // Load data and setup app
-                await this.loadInitialData();
+                // Load data from localStorage
+                this.loadData();
                 
                 // Check if user is logged in
                 this.checkUserSession();
@@ -874,101 +840,9 @@
 
                 // Update status indicator
                 this.updateOnlineStatus();
-            }
-
-            async initDatabase() {
-                return new Promise((resolve, reject) => {
-                    const request = indexedDB.open('ReyaCommunityDB', 1);
-                    
-                    request.onerror = () => reject(request.error);
-                    request.onsuccess = () => {
-                        this.db = request.result;
-                        resolve();
-                    };
-                    
-                    request.onupgradeneeded = (event) => {
-                        const db = event.target.result;
-                        
-                        // Create object stores
-                        if (!db.objectStoreNames.contains('members')) {
-                            const memberStore = db.createObjectStore('members', { keyPath: 'id' });
-                            memberStore.createIndex('membershipNumber', 'membershipNumber', { unique: true });
-                        }
-                        
-                        if (!db.objectStoreNames.contains('announcements')) {
-                            const announcementStore = db.createObjectStore('announcements', { keyPath: 'id' });
-                            announcementStore.createIndex('date', 'date', { unique: false });
-                        }
-                        
-                        if (!db.objectStoreNames.contains('events')) {
-                            const eventStore = db.createObjectStore('events', { keyPath: 'id' });
-                            eventStore.createIndex('date', 'date', { unique: false });
-                        }
-                        
-                        if (!db.objectStoreNames.contains('messages')) {
-                            const messageStore = db.createObjectStore('messages', { keyPath: 'id' });
-                            messageStore.createIndex('date', 'date', { unique: false });
-                        }
-                        
-                        if (!db.objectStoreNames.contains('documents')) {
-                            const documentStore = db.createObjectStore('documents', { keyPath: 'id' });
-                        }
-                        
-                        if (!db.objectStoreNames.contains('comments')) {
-                            const commentStore = db.createObjectStore('comments', { keyPath: 'id' });
-                            commentStore.createIndex('announcementId', 'announcementId', { unique: false });
-                        }
-                        
-                        if (!db.objectStoreNames.contains('settings')) {
-                            const settingsStore = db.createObjectStore('settings', { keyPath: 'key' });
-                        }
-                    };
-                });
-            }
-
-            async loadInitialData() {
-                // Check if first time setup is needed
-                const setup = await this.getSetting('firstTimeSetup');
-                if (!setup || !setup.value) {
-                    await this.showFirstTimeSetup();
-                }
                 
-                // Load all data
-                await Promise.all([
-                    this.loadAnnouncements(),
-                    this.loadEvents(),
-                    this.loadMessages(),
-                    this.loadDocuments(),
-                    this.loadDirectory(),
-                    this.loadStats()
-                ]);
-            }
-
-            async showFirstTimeSetup() {
-                // Create initial admin user
-                const adminUser = {
-                    username: 'reyatsotella-admin',
-                    password: 'Reyatsotella2025!'
-                };
-                
-                await this.setSetting('adminCredentials', adminUser);
-                await this.setSetting('firstTimeSetup', { value: true, timestamp: Date.now() });
-                
-                // Create sample announcements
-                const sampleAnnouncements = [
-                    {
-                        id: 'ann1',
-                        title: 'Welcome to Reyatsotella Community App',
-                        content: 'Welcome to our new community application! This app will help us stay connected and share important information. Please register and start using the features.',
-                        date: Date.now(),
-                        author: 'System',
-                        approved: true
-                    }
-                ];
-                
-                for (const announcement of sampleAnnouncements) {
-                    await this.addAnnouncement(announcement);
-                }
+                // Load content
+                this.loadContent();
             }
 
             setupEventListeners() {
@@ -982,9 +856,6 @@
                 document.getElementById('new-event-form').addEventListener('submit', (e) => this.handleNewEvent(e));
                 document.getElementById('new-message-form').addEventListener('submit', (e) => this.handleNewMessage(e));
                 document.getElementById('new-document-form').addEventListener('submit', (e) => this.handleNewDocument(e));
-                
-                // Password change
-                document.getElementById('change-password-form').addEventListener('submit', (e) => this.handlePasswordChange(e));
                 
                 // Search
                 document.getElementById('member-search').addEventListener('input', (e) => this.searchMembers(e.target.value));
@@ -1022,51 +893,46 @@
                     const userData = JSON.parse(session);
                     if (userData.type === 'admin') {
                         this.loginAsAdmin();
-                    } else {
+                    } else if (userData.member) {
                         this.loginAsMember(userData.member);
                     }
                 }
             }
 
-            async handleLogin(e) {
+            handleLogin(e) {
                 e.preventDefault();
                 
                 const membershipNumber = document.getElementById('login-membership').value.trim();
                 const phone = document.getElementById('login-phone').value.trim();
                 
-                try {
-                    const member = await this.getMemberByCredentials(membershipNumber, phone);
-                    if (member) {
-                        this.loginAsMember(member);
-                        this.showAlert('Login successful! Welcome back.', 'success');
-                    } else {
-                        this.showAlert('Invalid credentials. Please check your membership number and phone number.', 'error');
-                    }
-                } catch (error) {
-                    this.showAlert('Login error. Please try again.', 'error');
+                const member = this.members.find(m => 
+                    m.membershipNumber === membershipNumber && m.phone === phone
+                );
+                
+                if (member) {
+                    this.loginAsMember(member);
+                    this.showAlert('Login successful! Welcome back.', 'success');
+                } else {
+                    this.showAlert('Invalid credentials. Please check your membership number and phone number.', 'error');
                 }
             }
 
-            async handleAdminLogin(e) {
+            handleAdminLogin(e) {
                 e.preventDefault();
                 
                 const username = document.getElementById('admin-username').value.trim();
                 const password = document.getElementById('admin-password').value;
                 
-                try {
-                    const adminCreds = await this.getSetting('adminCredentials');
-                    if (adminCreds && adminCreds.username === username && adminCreds.password === password) {
-                        this.loginAsAdmin();
-                        this.showAlert('Admin login successful!', 'success');
-                    } else {
-                        this.showAlert('Invalid admin credentials.', 'error');
-                    }
-                } catch (error) {
-                    this.showAlert('Login error. Please try again.', 'error');
+                // Simple admin authentication
+                if (username === 'reyatsotella-admin' && password === 'Reyatsotella2025!') {
+                    this.loginAsAdmin();
+                    this.showAlert('Admin login successful!', 'success');
+                } else {
+                    this.showAlert('Invalid admin credentials.', 'error');
                 }
             }
 
-            async handleRegistration(e) {
+            handleRegistration(e) {
                 e.preventDefault();
                 
                 const formData = {
@@ -1077,66 +943,31 @@
                     emergencyContact: document.getElementById('reg-emergency-contact').value.trim()
                 };
                 
-                try {
-                    // Check if membership number already exists
-                    const existing = await this.getMemberByMembership(formData.membershipNumber);
-                    if (existing) {
-                        this.showAlert('This membership number is already registered.', 'error');
-                        return;
-                    }
-                    
-                    // Add new member
-                    const member = {
-                        id: 'member_' + Date.now(),
-                        ...formData,
-                        registeredAt: Date.now(),
-                        status: 'active'
-                    };
-                    
-                    await this.addMember(member);
-                    this.showAlert('Registration successful! You can now login.', 'success');
-                    
-                    // Clear form
-                    document.getElementById('register-form').reset();
-                    
-                    // Switch to login tab
-                    this.showAuthForm('login');
-                    
-                } catch (error) {
-                    this.showAlert('Registration error. Please try again.', 'error');
-                }
-            }
-
-            async handlePasswordChange(e) {
-                e.preventDefault();
-                
-                const currentPassword = document.getElementById('current-password').value;
-                const newPassword = document.getElementById('new-password').value;
-                const confirmPassword = document.getElementById('confirm-password').value;
-                
-                if (newPassword !== confirmPassword) {
-                    this.showAlert('New passwords do not match.', 'error');
+                // Check if membership number already exists
+                const existing = this.members.find(m => m.membershipNumber === formData.membershipNumber);
+                if (existing) {
+                    this.showAlert('This membership number is already registered.', 'error');
                     return;
                 }
                 
-                if (newPassword.length < 6) {
-                    this.showAlert('New password must be at least 6 characters long.', 'error');
-                    return;
-                }
+                // Add new member
+                const member = {
+                    id: 'member_' + Date.now(),
+                    ...formData,
+                    registeredAt: Date.now(),
+                    status: 'active'
+                };
                 
-                try {
-                    const adminCreds = await this.getSetting('adminCredentials');
-                    if (adminCreds && adminCreds.password === currentPassword) {
-                        adminCreds.password = newPassword;
-                        await this.setSetting('adminCredentials', adminCreds);
-                        this.showAlert('Password updated successfully!', 'success');
-                        document.getElementById('change-password-form').reset();
-                    } else {
-                        this.showAlert('Current password is incorrect.', 'error');
-                    }
-                } catch (error) {
-                    this.showAlert('Error updating password. Please try again.', 'error');
-                }
+                this.members.push(member);
+                this.saveData();
+                
+                this.showAlert('Registration successful! You can now login.', 'success');
+                
+                // Clear form
+                document.getElementById('register-form').reset();
+                
+                // Switch to login tab
+                this.showAuthForm('login');
             }
 
             loginAsMember(member) {
@@ -1187,196 +1018,51 @@
                 
                 // Clear forms
                 document.querySelectorAll('form').forEach(form => form.reset());
+                
+                // Show auth section
+                this.showAuthForm('login');
             }
 
-            // Database operations
-            async getSetting(key) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['settings'], 'readonly');
-                    const store = transaction.objectStore('settings');
-                    const request = store.get(key);
-                    
-                    request.onsuccess = () => resolve(request.result || null);
-                    request.onerror = () => reject(request.error);
-                });
+            // Data management
+            loadData() {
+                this.members = JSON.parse(localStorage.getItem('reyaMembers') || '[]');
+                this.announcements = JSON.parse(localStorage.getItem('reyaAnnouncements') || '[]');
+                this.events = JSON.parse(localStorage.getItem('reyaEvents') || '[]');
+                this.messages = JSON.parse(localStorage.getItem('reyaMessages') || '[]');
+                this.documents = JSON.parse(localStorage.getItem('reyaDocuments') || '[]');
+                this.comments = JSON.parse(localStorage.getItem('reyaComments') || '[]');
+                
+                // Initialize with sample data if empty
+                if (this.announcements.length === 0) {
+                    this.announcements.push({
+                        id: 'ann1',
+                        title: 'Welcome to Reya Tsotella Community App',
+                        content: 'Welcome to our new community application! This app will help us stay connected and share important information. Please register and start using the features.',
+                        date: Date.now(),
+                        author: 'System',
+                        approved: true
+                    });
+                }
             }
 
-            async setSetting(key, value) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['settings'], 'readwrite');
-                    const store = transaction.objectStore('settings');
-                    const request = store.put({ key, value });
-                    
-                    request.onsuccess = () => resolve();
-                    request.onerror = () => reject(request.error);
-                });
+            saveData() {
+                localStorage.setItem('reyaMembers', JSON.stringify(this.members));
+                localStorage.setItem('reyaAnnouncements', JSON.stringify(this.announcements));
+                localStorage.setItem('reyaEvents', JSON.stringify(this.events));
+                localStorage.setItem('reyaMessages', JSON.stringify(this.messages));
+                localStorage.setItem('reyaDocuments', JSON.stringify(this.documents));
+                localStorage.setItem('reyaComments', JSON.stringify(this.comments));
             }
 
-            async addMember(member) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['members'], 'readwrite');
-                    const store = transaction.objectStore('members');
-                    const request = store.add(member);
-                    
-                    request.onsuccess = () => resolve();
-                    request.onerror = () => reject(request.error);
-                });
+            loadContent() {
+                this.loadAnnouncements();
+                this.loadEvents();
+                this.loadMessages();
+                this.loadDocuments();
+                this.loadDirectory();
+                this.loadStats();
             }
 
-            async getMemberByMembership(membershipNumber) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['members'], 'readonly');
-                    const store = transaction.objectStore('members');
-                    const index = store.index('membershipNumber');
-                    const request = index.get(membershipNumber);
-                    
-                    request.onsuccess = () => resolve(request.result || null);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async getMemberByCredentials(membershipNumber, phone) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['members'], 'readonly');
-                    const store = transaction.objectStore('members');
-                    const index = store.index('membershipNumber');
-                    const request = index.get(membershipNumber);
-                    
-                    request.onsuccess = () => {
-                        const member = request.result;
-                        if (member && member.phone === phone) {
-                            resolve(member);
-                        } else {
-                            resolve(null);
-                        }
-                    };
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async getAllMembers() {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['members'], 'readonly');
-                    const store = transaction.objectStore('members');
-                    const request = store.getAll();
-                    
-                    request.onsuccess = () => resolve(request.result || []);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async addAnnouncement(announcement) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['announcements'], 'readwrite');
-                    const store = transaction.objectStore('announcements');
-                    const request = store.add(announcement);
-                    
-                    request.onsuccess = () => resolve();
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async getAllAnnouncements() {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['announcements'], 'readonly');
-                    const store = transaction.objectStore('announcements');
-                    const request = store.getAll();
-                    
-                    request.onsuccess = () => resolve(request.result || []);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async addEvent(event) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['events'], 'readwrite');
-                    const store = transaction.objectStore('events');
-                    const request = store.add(event);
-                    
-                    request.onsuccess = () => resolve();
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async getAllEvents() {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['events'], 'readonly');
-                    const store = transaction.objectStore('events');
-                    const request = store.getAll();
-                    
-                    request.onsuccess = () => resolve(request.result || []);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async addMessage(message) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['messages'], 'readwrite');
-                    const store = transaction.objectStore('messages');
-                    const request = store.add(message);
-                    
-                    request.onsuccess = () => resolve();
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async getAllMessages() {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['messages'], 'readonly');
-                    const store = transaction.objectStore('messages');
-                    const request = store.getAll();
-                    
-                    request.onsuccess = () => resolve(request.result || []);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async addDocument(document) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['documents'], 'readwrite');
-                    const store = transaction.objectStore('documents');
-                    const request = store.add(document);
-                    
-                    request.onsuccess = () => resolve();
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async getAllDocuments() {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['documents'], 'readonly');
-                    const store = transaction.objectStore('documents');
-                    const request = store.getAll();
-                    
-                    request.onsuccess = () => resolve(request.result || []);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async addComment(comment) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['comments'], 'readwrite');
-                    const store = transaction.objectStore('comments');
-                    const request = store.add(comment);
-                    
-                    request.onsuccess = () => resolve();
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            async getCommentsByAnnouncement(announcementId) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction(['comments'], 'readonly');
-                    const store = transaction.objectStore('comments');
-                    const index = store.index('announcementId');
-                    const request = index.getAll(announcementId);
-                    
-                    request.onsuccess = () => resolve(request.result || []);
-                    request.onerror = () => reject(request.error);
-                });
-            }
-
-            // UI Methods
             showAlert(message, type = 'info') {
                 const alertDiv = document.createElement('div');
                 alertDiv.className = `alert alert-${type}`;
@@ -1396,19 +1082,18 @@
             }
 
             // Content Management
-            async loadAnnouncements() {
-                const announcements = await this.getAllAnnouncements();
-                announcements.sort((a, b) => b.date - a.date);
+            loadAnnouncements() {
+                this.announcements.sort((a, b) => b.date - a.date);
                 
                 const container = document.getElementById('announcements-list');
                 container.innerHTML = '';
                 
-                if (announcements.length === 0) {
+                if (this.announcements.length === 0) {
                     container.innerHTML = '<div class="card"><p>No announcements yet.</p></div>';
                     return;
                 }
                 
-                for (const announcement of announcements) {
+                for (const announcement of this.announcements) {
                     const announcementDiv = document.createElement('div');
                     announcementDiv.className = 'card';
                     announcementDiv.innerHTML = `
@@ -1449,27 +1134,27 @@
                 }
             }
 
-            async loadCommentsCount(announcementId) {
-                const comments = await this.getCommentsByAnnouncement(announcementId);
+            loadCommentsCount(announcementId) {
+                const announcementComments = this.comments.filter(c => c.announcementId === announcementId);
                 const countElement = document.getElementById(`comment-count-${announcementId}`);
                 if (countElement) {
-                    countElement.textContent = comments.length;
+                    countElement.textContent = announcementComments.length;
                 }
             }
 
-            async loadComments(announcementId) {
-                const comments = await this.getCommentsByAnnouncement(announcementId);
-                comments.sort((a, b) => a.date - b.date);
+            loadComments(announcementId) {
+                const announcementComments = this.comments.filter(c => c.announcementId === announcementId);
+                announcementComments.sort((a, b) => a.date - b.date);
                 
                 const container = document.getElementById(`comments-list-${announcementId}`);
                 container.innerHTML = '';
                 
-                if (comments.length === 0) {
+                if (announcementComments.length === 0) {
                     container.innerHTML = '<p>No comments yet.</p>';
                     return;
                 }
                 
-                for (const comment of comments) {
+                for (const comment of announcementComments) {
                     const commentDiv = document.createElement('div');
                     commentDiv.className = 'comment';
                     commentDiv.innerHTML = `
@@ -1488,7 +1173,7 @@
                 }
             }
 
-            async addCommentToAnnouncement(announcementId, event) {
+            addCommentToAnnouncement(announcementId, event) {
                 event.preventDefault();
                 
                 if (!this.currentUser || this.isAdmin) return;
@@ -1506,46 +1191,38 @@
                     approved: true
                 };
                 
-                try {
-                    await this.addComment(comment);
-                    document.getElementById(`comment-text-${announcementId}`).value = '';
-                    await this.loadComments(announcementId);
-                    await this.loadCommentsCount(announcementId);
-                    this.showAlert('Comment posted successfully!', 'success');
-                } catch (error) {
-                    this.showAlert('Error posting comment. Please try again.', 'error');
-                }
+                this.comments.push(comment);
+                this.saveData();
+                
+                document.getElementById(`comment-text-${announcementId}`).value = '';
+                this.loadComments(announcementId);
+                this.loadCommentsCount(announcementId);
+                this.showAlert('Comment posted successfully!', 'success');
             }
 
-            async deleteComment(commentId, announcementId) {
+            deleteComment(commentId, announcementId) {
                 if (!this.isAdmin) return;
                 
-                try {
-                    const transaction = this.db.transaction(['comments'], 'readwrite');
-                    const store = transaction.objectStore('comments');
-                    await store.delete(commentId);
-                    
-                    await this.loadComments(announcementId);
-                    await this.loadCommentsCount(announcementId);
-                    this.showAlert('Comment deleted.', 'success');
-                } catch (error) {
-                    this.showAlert('Error deleting comment. Please try again.', 'error');
-                }
+                this.comments = this.comments.filter(c => c.id !== commentId);
+                this.saveData();
+                
+                this.loadComments(announcementId);
+                this.loadCommentsCount(announcementId);
+                this.showAlert('Comment deleted.', 'success');
             }
 
-            async loadEvents() {
-                const events = await this.getAllEvents();
-                events.sort((a, b) => a.date - b.date);
+            loadEvents() {
+                this.events.sort((a, b) => a.date - b.date);
                 
                 const container = document.getElementById('events-list');
                 container.innerHTML = '';
                 
-                if (events.length === 0) {
+                if (this.events.length === 0) {
                     container.innerHTML = '<div class="card"><p>No events scheduled yet.</p></div>';
                     return;
                 }
                 
-                for (const event of events) {
+                for (const event of this.events) {
                     const eventDiv = document.createElement('div');
                     eventDiv.className = 'card';
                     eventDiv.innerHTML = `
@@ -1572,19 +1249,18 @@
                 }
             }
 
-            async loadMessages() {
-                const messages = await this.getAllMessages();
-                messages.sort((a, b) => b.date - a.date);
+            loadMessages() {
+                this.messages.sort((a, b) => b.date - a.date);
                 
                 const container = document.getElementById('messages-list');
                 container.innerHTML = '';
                 
-                if (messages.length === 0) {
+                if (this.messages.length === 0) {
                     container.innerHTML = '<div class="card"><p>No messages yet.</p></div>';
                     return;
                 }
                 
-                for (const message of messages) {
+                for (const message of this.messages) {
                     const messageDiv = document.createElement('div');
                     messageDiv.className = 'card';
                     messageDiv.innerHTML = `
@@ -1603,18 +1279,16 @@
                 }
             }
 
-            async loadDocuments() {
-                const documents = await this.getAllDocuments();
-                
+            loadDocuments() {
                 const container = document.getElementById('documents-list');
                 container.innerHTML = '';
                 
-                if (documents.length === 0) {
+                if (this.documents.length === 0) {
                     container.innerHTML = '<div class="card"><p>No documents available yet.</p></div>';
                     return;
                 }
                 
-                for (const document of documents) {
+                for (const document of this.documents) {
                     const documentDiv = document.createElement('div');
                     documentDiv.className = 'card';
                     documentDiv.innerHTML = `
@@ -1639,12 +1313,10 @@
                 }
             }
 
-            async loadDirectory() {
-                const members = await this.getAllMembers();
-                members.sort((a, b) => a.name.localeCompare(b.name));
-                
+            loadDirectory() {
+                this.members.sort((a, b) => a.name.localeCompare(b.name));
                 const container = document.getElementById('directory-list');
-                this.renderDirectory(members, container);
+                this.renderDirectory(this.members, container);
             }
 
             renderDirectory(members, container) {
@@ -1679,41 +1351,30 @@
             }
 
             searchMembers(query) {
-                const members = this.filterMembers(query);
-                const container = document.getElementById('directory-list');
-                this.renderDirectory(members, container);
-            }
-
-            async filterMembers(query) {
                 if (!query.trim()) {
-                    return await this.getAllMembers();
+                    this.renderDirectory(this.members, document.getElementById('directory-list'));
+                    return;
                 }
                 
-                const members = await this.getAllMembers();
                 const searchTerm = query.toLowerCase();
-                
-                return members.filter(member => 
+                const filteredMembers = this.members.filter(member => 
                     member.name.toLowerCase().includes(searchTerm) ||
                     member.membershipNumber.toLowerCase().includes(searchTerm)
                 );
+                
+                this.renderDirectory(filteredMembers, document.getElementById('directory-list'));
             }
 
-            async loadStats() {
+            loadStats() {
                 if (!this.isAdmin) return;
                 
-                const [members, announcements, events] = await Promise.all([
-                    this.getAllMembers(),
-                    this.getAllAnnouncements(),
-                    this.getAllEvents()
-                ]);
-                
-                document.getElementById('stats-members').textContent = members.length;
-                document.getElementById('stats-announcements').textContent = announcements.length;
-                document.getElementById('stats-events').textContent = events.filter(e => e.date > Date.now()).length;
+                document.getElementById('stats-members').textContent = this.members.length;
+                document.getElementById('stats-announcements').textContent = this.announcements.length;
+                document.getElementById('stats-events').textContent = this.events.filter(e => e.date > Date.now()).length;
             }
 
             // Form Handlers
-            async handleNewAnnouncement(e) {
+            handleNewAnnouncement(e) {
                 e.preventDefault();
                 if (!this.isAdmin) return;
                 
@@ -1729,19 +1390,16 @@
                     approved: true
                 };
                 
-                try {
-                    await this.addAnnouncement(announcement);
-                    await this.loadAnnouncements();
-                    await this.loadStats();
-                    
-                    document.getElementById('new-announcement-form').reset();
-                    this.showAlert('Announcement posted successfully!', 'success');
-                } catch (error) {
-                    this.showAlert('Error posting announcement. Please try again.', 'error');
-                }
+                this.announcements.push(announcement);
+                this.saveData();
+                this.loadAnnouncements();
+                this.loadStats();
+                
+                document.getElementById('new-announcement-form').reset();
+                this.showAlert('Announcement posted successfully!', 'success');
             }
 
-            async handleNewEvent(e) {
+            handleNewEvent(e) {
                 e.preventDefault();
                 if (!this.isAdmin) return;
                 
@@ -1759,19 +1417,16 @@
                     createdBy: 'Administrator'
                 };
                 
-                try {
-                    await this.addEvent(event);
-                    await this.loadEvents();
-                    await this.loadStats();
-                    
-                    document.getElementById('new-event-form').reset();
-                    this.showAlert('Event created successfully!', 'success');
-                } catch (error) {
-                    this.showAlert('Error creating event. Please try again.', 'error');
-                }
+                this.events.push(event);
+                this.saveData();
+                this.loadEvents();
+                this.loadStats();
+                
+                document.getElementById('new-event-form').reset();
+                this.showAlert('Event created successfully!', 'success');
             }
 
-            async handleNewMessage(e) {
+            handleNewMessage(e) {
                 e.preventDefault();
                 if (!this.isAdmin) return;
                 
@@ -1786,18 +1441,15 @@
                     sentBy: 'Administrator'
                 };
                 
-                try {
-                    await this.addMessage(message);
-                    await this.loadMessages();
-                    
-                    document.getElementById('new-message-form').reset();
-                    this.showAlert('Message sent successfully!', 'success');
-                } catch (error) {
-                    this.showAlert('Error sending message. Please try again.', 'error');
-                }
+                this.messages.push(message);
+                this.saveData();
+                this.loadMessages();
+                
+                document.getElementById('new-message-form').reset();
+                this.showAlert('Message sent successfully!', 'success');
             }
 
-            async handleNewDocument(e) {
+            handleNewDocument(e) {
                 e.preventDefault();
                 if (!this.isAdmin) return;
                 
@@ -1814,109 +1466,84 @@
                     addedDate: Date.now()
                 };
                 
-                try {
-                    await this.addDocument(document);
-                    await this.loadDocuments();
-                    
-                    document.getElementById('new-document-form').reset();
-                    this.showAlert('Document added successfully!', 'success');
-                } catch (error) {
-                    this.showAlert('Error adding document. Please try again.', 'error');
-                }
+                this.documents.push(document);
+                this.saveData();
+                this.loadDocuments();
+                
+                document.getElementById('new-document-form').reset();
+                this.showAlert('Document added successfully!', 'success');
             }
 
             // Utility Methods
-            async deleteEvent(eventId) {
+            deleteEvent(eventId) {
                 if (!this.isAdmin) return;
                 
-                try {
-                    const transaction = this.db.transaction(['events'], 'readwrite');
-                    const store = transaction.objectStore('events');
-                    await store.delete(eventId);
-                    
-                    await this.loadEvents();
-                    await this.loadStats();
-                    this.showAlert('Event deleted.', 'success');
-                } catch (error) {
-                    this.showAlert('Error deleting event. Please try again.', 'error');
-                }
+                this.events = this.events.filter(e => e.id !== eventId);
+                this.saveData();
+                this.loadEvents();
+                this.loadStats();
+                this.showAlert('Event deleted.', 'success');
             }
 
-            async deleteMessage(messageId) {
+            deleteMessage(messageId) {
                 if (!this.isAdmin) return;
                 
-                try {
-                    const transaction = this.db.transaction(['messages'], 'readwrite');
-                    const store = transaction.objectStore('messages');
-                    await store.delete(messageId);
-                    
-                    await this.loadMessages();
-                    this.showAlert('Message deleted.', 'success');
-                } catch (error) {
-                    this.showAlert('Error deleting message. Please try again.', 'error');
-                }
+                this.messages = this.messages.filter(m => m.id !== messageId);
+                this.saveData();
+                this.loadMessages();
+                this.showAlert('Message deleted.', 'success');
             }
 
-            async deleteDocument(documentId) {
+            deleteDocument(documentId) {
                 if (!this.isAdmin) return;
                 
-                try {
-                    const transaction = this.db.transaction(['documents'], 'readwrite');
-                    const store = transaction.objectStore('documents');
-                    await store.delete(documentId);
-                    
-                    await this.loadDocuments();
-                    this.showAlert('Document deleted.', 'success');
-                } catch (error) {
-                    this.showAlert('Error deleting document. Please try again.', 'error');
-                }
+                this.documents = this.documents.filter(d => d.id !== documentId);
+                this.saveData();
+                this.loadDocuments();
+                this.showAlert('Document deleted.', 'success');
             }
 
-            async exportData() {
-                try {
-                    const data = {
-                        members: await this.getAllMembers(),
-                        announcements: await this.getAllAnnouncements(),
-                        events: await this.getAllEvents(),
-                        messages: await this.getAllMessages(),
-                        documents: await this.getAllDocuments()
-                    };
-                    
-                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `reya-community-backup-${new Date().toISOString().split('T')[0]}.json`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    
-                    this.showAlert('Data exported successfully!', 'success');
-                } catch (error) {
-                    this.showAlert('Error exporting data. Please try again.', 'error');
-                }
+            exportData() {
+                const data = {
+                    members: this.members,
+                    announcements: this.announcements,
+                    events: this.events,
+                    messages: this.messages,
+                    documents: this.documents
+                };
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `reya-community-backup-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                this.showAlert('Data exported successfully!', 'success');
             }
 
-            async clearAllData() {
+            clearAllData() {
                 if (!confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
                     return;
                 }
                 
-                try {
-                    const storeNames = ['members', 'announcements', 'events', 'messages', 'documents', 'comments'];
-                    
-                    for (const storeName of storeNames) {
-                        const transaction = this.db.transaction([storeName], 'readwrite');
-                        const store = transaction.objectStore(storeName);
-                        await store.clear();
-                    }
-                    
-                    await this.loadInitialData();
-                    this.showAlert('All data cleared successfully!', 'success');
-                } catch (error) {
-                    this.showAlert('Error clearing data. Please try again.', 'error');
-                }
+                this.members = [];
+                this.announcements = [];
+                this.events = [];
+                this.messages = [];
+                this.documents = [];
+                this.comments = [];
+                
+                localStorage.clear();
+                
+                // Re-initialize with sample data
+                this.loadData();
+                this.loadContent();
+                
+                this.showAlert('All data cleared successfully!', 'success');
             }
         }
 
@@ -1973,6 +1600,12 @@
             const form = document.getElementById('announcement-form');
             if (form) {
                 form.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function logout() {
+            if (app) {
+                app.logout();
             }
         }
 
