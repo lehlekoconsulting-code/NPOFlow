@@ -1,1618 +1,1379 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reyatsotella Community Centre</title>
-    
-    <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#BF151B">
-    <meta name="description" content="Reyatsotella Community Centre - Stay connected with your community">
-    <meta name="keywords" content="community centre, announcements, events, messaging">
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
-    
-    <!-- Apple Touch Icon -->
-    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="icons/icon-192x192.png">
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    
-    <style>
-        /* Reya Tsotella Community Centre - Fixed Secure App */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        :root {
-            --primary-red: #BF151B;
-            --dark-blue-grey: #303F4B;
-            --light-grey: #F7F9FA;
-            --white: #FFFFFF;
-            --text-dark: #2C3E50;
-            --border-color: #E1E8ED;
-            --success-green: #28A745;
-            --warning-orange: #FD7E14;
-            --error-red: #DC3545;
-        }
-        
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--light-grey);
-            color: var(--text-dark);
-            line-height: 1.6;
-        }
-        
-        /* Loading Screen */
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--primary-red) 0%, #a81218 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            flex-direction: column;
-            color: white;
-        }
-        
-        #loading-screen img {
-            height: 100px;
-            margin-bottom: 20px;
-            border-radius: 12px;
-        }
-        
-        #loading-screen h2 {
-            margin: 0;
-            font-family: 'Montserrat', sans-serif;
-        }
-        
-        #loading-screen p {
-            margin: 10px 0 0 0;
-            font-family: 'Montserrat', sans-serif;
-        }
-        
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(255,255,255,0.3);
-            border-top: 4px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-top: 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Header */
-        .header {
-            background: var(--primary-red);
-            color: white;
-            padding: 1rem;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .header h1 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .header p {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-        
-        /* Navigation */
-        .nav-tabs {
-            display: flex;
-            background: var(--white);
-            border-bottom: 1px solid var(--border-color);
-            overflow-x: auto;
-        }
-        
-        .nav-tab {
-            flex: 1;
-            padding: 1rem;
-            text-align: center;
-            cursor: pointer;
-            border: none;
-            background: none;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            color: var(--text-dark);
-            transition: all 0.3s ease;
-            min-width: 120px;
-        }
-        
-        .nav-tab:hover {
-            background: var(--light-grey);
-        }
-        
-        .nav-tab.active {
-            color: var(--primary-red);
-            border-bottom: 3px solid var(--primary-red);
-        }
-        
-        /* Content Sections */
-        .content-section {
-            display: none;
-            padding: 1.5rem;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        .content-section.active {
-            display: block;
-        }
-        
-        /* Forms */
-        .auth-container {
-            max-width: 400px;
-            margin: 2rem auto;
-            background: var(--white);
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        
-        .auth-form {
-            display: none;
-        }
-        
-        .auth-form.active {
-            display: block;
-        }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-        
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--primary-red);
-        }
-        
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-block;
-            text-decoration: none;
-            text-align: center;
-        }
-        
-        .btn-primary {
-            background: var(--primary-red);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #a81218;
-        }
-        
-        .btn-secondary {
-            background: var(--dark-blue-grey);
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background: #26323a;
-        }
-        
-        .btn-success {
-            background: var(--success-green);
-            color: white;
-        }
-        
-        .btn-success:hover {
-            background: #218838;
-        }
-        
-        .btn-warning {
-            background: var(--warning-orange);
-            color: white;
-        }
-        
-        .btn-warning:hover {
-            background: #e86600;
-        }
-        
-        .btn-danger {
-            background: var(--error-red);
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background: #c82333;
-        }
-        
-        /* Cards */
-        .card {
-            background: var(--white);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .card h3 {
-            margin-bottom: 1rem;
-            color: var(--text-dark);
-        }
-        
-        .card-meta {
-            color: #6C757D;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        /* Member Directory */
-        .member-card {
-            background: var(--white);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .member-info h4 {
-            margin-bottom: 0.5rem;
-            color: var(--text-dark);
-        }
-        
-        .member-meta {
-            color: #6C757D;
-            font-size: 0.9rem;
-        }
-        
-        .contact-info {
-            text-align: right;
-            font-size: 0.9rem;
-            color: #6C757D;
-        }
-        
-        /* Comments */
-        .comment {
-            background: var(--light-grey);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .comment-author {
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
-        }
-        
-        .comment-content {
-            margin-bottom: 0.5rem;
-        }
-        
-        .comment-time {
-            font-size: 0.8rem;
-            color: #6C757D;
-        }
-        
-        .comment-actions {
-            margin-top: 0.5rem;
-        }
-        
-        /* Alerts */
-        .alert {
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            border: none;
-        }
-        
-        .alert-success {
-            background: rgba(40, 167, 69, 0.1);
-            border: 1px solid var(--success-green);
-            color: var(--success-green);
-        }
-        
-        .alert-error {
-            background: rgba(220, 53, 69, 0.1);
-            border: 1px solid var(--error-red);
-            color: var(--error-red);
-        }
-        
-        .alert-warning {
-            background: rgba(253, 126, 20, 0.1);
-            border: 1px solid var(--warning-orange);
-            color: var(--warning-orange);
-        }
-        
-        /* Hidden */
-        .hidden {
-            display: none !important;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-tab {
-                font-size: 0.9rem;
-                padding: 0.75rem 0.5rem;
-            }
-            
-            .auth-container {
-                margin: 1rem;
-                padding: 1.5rem;
-            }
-            
-            .content-section {
-                padding: 1rem;
-            }
-            
-            .member-card {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .contact-info {
-                text-align: left;
-                margin-top: 0.5rem;
-            }
-        }
-        
-        /* Status indicator */
-        .status-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-        }
-        
-        .status-online {
-            background: rgba(40, 167, 69, 0.1);
-            color: var(--success-green);
-        }
-        
-        .status-offline {
-            background: rgba(108, 117, 125, 0.1);
-            color: #6C757D;
-        }
-        
-        /* Security Notice */
-        .security-notice {
-            background: rgba(191, 21, 27, 0.1);
-            border: 1px solid var(--primary-red);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-        
-        .security-notice h4 {
-            color: var(--primary-red);
-            margin-bottom: 0.5rem;
-        }
-        
-        /* Admin Settings */
-        .admin-settings {
-            background: rgba(40, 167, 69, 0.05);
-            border: 1px solid var(--success-green);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .settings-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reyatsotella Community Centre</title>
+<!-- PWA Meta Tags -->
+<meta name="theme-color" content="#BF151B">
+<meta name="description" content="Reyatsotella Community Centre - Stay connected with your community">
+<meta name="keywords" content="community centre, announcements, events, messaging">
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+<!-- Apple Touch Icon -->
+<link rel="apple-touch-icon" href="icons/icon-192x192.png">
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="icons/icon-192x192.png">
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style>
+/* Reyatsotella Community Centre - Fixed Secure App */
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+:root {
+--primary-red: #BF151B;
+--dark-blue-grey: #303F4B;
+--light-grey: #F7F9FA;
+--white: #FFFFFF;
+--text-dark: #2C3E50;
+--border-color: #E1E8ED;
+--success-green: #28A745;
+--warning-orange: #FD7E14;
+--error-red: #DC3545;
+}
+body {
+font-family: 'Montserrat', sans-serif;
+background-color: var(--light-grey);
+color: var(--text-dark);
+line-height: 1.6;
+}
+/* Loading Screen */
+#loading-screen {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: linear-gradient(135deg, var(--primary-red) 0%, #a81218 100%);
+display: flex;
+align-items: center;
+justify-content: center;
+z-index: 9999;
+flex-direction: column;
+color: white;
+}
+#loading-screen img {
+height: 100px;
+margin-bottom: 20px;
+border-radius: 12px;
+}
+#loading-screen h2 {
+margin: 0;
+font-family: 'Montserrat', sans-serif;
+}
+#loading-screen p {
+margin: 10px 0 0 0;
+font-family: 'Montserrat', sans-serif;
+}
+.loading-spinner {
+width: 40px;
+height: 40px;
+border: 4px solid rgba(255,255,255,0.3);
+border-top: 4px solid white;
+border-radius: 50%;
+animation: spin 1s linear infinite;
+margin-top: 20px;
+}
+@keyframes spin {
+0% { transform: rotate(0deg); }
+100% { transform: rotate(360deg); }
+}
+/* Header */
+.header {
+background: var(--primary-red);
+color: white;
+padding: 1rem;
+text-align: center;
+box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.header h1 {
+font-size: 1.5rem;
+margin-bottom: 0.5rem;
+}
+.header p {
+font-size: 0.9rem;
+opacity: 0.9;
+}
+/* Navigation */
+.nav-tabs {
+display: flex;
+background: var(--white);
+border-bottom: 1px solid var(--border-color);
+overflow-x: auto;
+}
+.nav-tab {
+flex: 1;
+padding: 1rem;
+text-align: center;
+cursor: pointer;
+border: none;
+background: none;
+font-family: 'Montserrat', sans-serif;
+font-weight: 600;
+color: var(--text-dark);
+transition: all 0.3s ease;
+min-width: 120px;
+}
+.nav-tab:hover {
+background: var(--light-grey);
+}
+.nav-tab.active {
+color: var(--primary-red);
+border-bottom: 3px solid var(--primary-red);
+}
+/* Content Sections */
+.content-section {
+display: none;
+padding: 1.5rem;
+max-width: 800px;
+margin: 0 auto;
+}
+.content-section.active {
+display: block;
+}
+/* Forms */
+.auth-container {
+max-width: 400px;
+margin: 2rem auto;
+background: var(--white);
+padding: 2rem;
+border-radius: 12px;
+box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+.auth-form {
+display: none;
+}
+.auth-form.active {
+display: block;
+}
+.form-group {
+margin-bottom: 1.5rem;
+}
+.form-group label {
+display: block;
+margin-bottom: 0.5rem;
+font-weight: 600;
+color: var(--text-dark);
+}
+.form-group input {
+width: 100%;
+padding: 0.75rem;
+border: 2px solid var(--border-color);
+border-radius: 8px;
+font-family: 'Montserrat', sans-serif;
+font-size: 1rem;
+transition: border-color 0.3s ease;
+}
+.form-group input:focus {
+outline: none;
+border-color: var(--primary-red);
+}
+.btn {
+padding: 0.75rem 1.5rem;
+border: none;
+border-radius: 8px;
+font-family: 'Montserrat', sans-serif;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.3s ease;
+display: inline-block;
+text-decoration: none;
+text-align: center;
+}
+.btn-primary {
+background: var(--primary-red);
+color: white;
+}
+.btn-primary:hover {
+background: #a81218;
+}
+.btn-secondary {
+background: var(--dark-blue-grey);
+color: white;
+}
+.btn-secondary:hover {
+background: #26323a;
+}
+.btn-success {
+background: var(--success-green);
+color: white;
+}
+.btn-success:hover {
+background: #218838;
+}
+.btn-warning {
+background: var(--warning-orange);
+color: white;
+}
+.btn-warning:hover {
+background: #e86600;
+}
+.btn-danger {
+background: var(--error-red);
+color: white;
+}
+.btn-danger:hover {
+background: #c82333;
+}
+/* Cards */
+.card {
+background: var(--white);
+border-radius: 12px;
+padding: 1.5rem;
+margin-bottom: 1.5rem;
+box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.card h3 {
+margin-bottom: 1rem;
+color: var(--text-dark);
+}
+.card-meta {
+color: #6C757D;
+font-size: 0.9rem;
+margin-bottom: 0.5rem;
+}
+/* Member Directory */
+.member-card {
+background: var(--white);
+border-radius: 8px;
+padding: 1rem;
+margin-bottom: 1rem;
+border: 1px solid var(--border-color);
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+.member-info h4 {
+margin-bottom: 0.5rem;
+color: var(--text-dark);
+}
+.member-meta {
+color: #6C757D;
+font-size: 0.9rem;
+}
+.contact-info {
+text-align: right;
+font-size: 0.9rem;
+color: #6C757D;
+}
+/* Comments */
+.comment {
+background: var(--light-grey);
+border-radius: 8px;
+padding: 1rem;
+margin-bottom: 1rem;
+}
+.comment-author {
+font-weight: 600;
+color: var(--text-dark);
+margin-bottom: 0.5rem;
+}
+.comment-content {
+margin-bottom: 0.5rem;
+}
+.comment-time {
+font-size: 0.8rem;
+color: #6C757D;
+}
+.comment-actions {
+margin-top: 0.5rem;
+}
+/* Alerts */
+.alert {
+padding: 1rem;
+border-radius: 8px;
+margin-bottom: 1rem;
+border: none;
+}
+.alert-success {
+background: rgba(40, 167, 69, 0.1);
+border: 1px solid var(--success-green);
+color: var(--success-green);
+}
+.alert-error {
+background: rgba(220, 53, 69, 0.1);
+border: 1px solid var(--error-red);
+color: var(--error-red);
+}
+.alert-warning {
+background: rgba(253, 126, 20, 0.1);
+border: 1px solid var(--warning-orange);
+color: var(--warning-orange);
+}
+/* Hidden */
+.hidden {
+display: none !important;
+}
+/* Responsive */
+@media (max-width: 768px) {
+.nav-tab {
+font-size: 0.9rem;
+padding: 0.75rem 0.5rem;
+}
+.auth-container {
+margin: 1rem;
+padding: 1.5rem;
+}
+.content-section {
+padding: 1rem;
+}
+.member-card {
+flex-direction: column;
+align-items: flex-start;
+}
+.contact-info {
+text-align: left;
+margin-top: 0.5rem;
+}
+}
+/* Status indicator */
+.status-indicator {
+display: inline-flex;
+align-items: center;
+gap: 0.5rem;
+padding: 0.5rem 1rem;
+border-radius: 20px;
+font-size: 0.9rem;
+margin-bottom: 1rem;
+}
+.status-online {
+background: rgba(40, 167, 69, 0.1);
+color: var(--success-green);
+}
+.status-offline {
+background: rgba(108, 117, 125, 0.1);
+color: #6C757D;
+}
+/* Security Notice */
+.security-notice {
+background: rgba(191, 21, 27, 0.1);
+border: 1px solid var(--primary-red);
+border-radius: 8px;
+padding: 1rem;
+margin-bottom: 1.5rem;
+text-align: center;
+}
+.security-notice h4 {
+color: var(--primary-red);
+margin-bottom: 0.5rem;
+}
+/* Admin Settings */
+.admin-settings {
+background: rgba(40, 167, 69, 0.05);
+border: 1px solid var(--success-green);
+border-radius: 8px;
+padding: 1.5rem;
+margin-bottom: 1.5rem;
+}
+.settings-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+gap: 1rem;
+margin-top: 1rem;
+}
+</style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loading-screen">
-        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23FFFFFF'/%3E%3Cpath d='M20 20L80 20L80 80L20 80Z' fill='%23BF151B'/%3E%3Ccircle cx='35' cy='35' r='8' fill='%23FFFFFF'/%3E%3Ccircle cx='50' cy='35' r='8' fill='%23FFFFFF'/%3E%3Ccircle cx='65' cy='35' r='8' fill='%23FFFFFF'/%3E%3Ctext x='50' y='70' text-anchor='middle' fill='%23BF151B' font-family='Arial' font-size='12' font-weight='bold'%3EREYA%3C/text%3E%3C/svg%3E" alt="Reya Tsotella Logo">
-        <h2>Reyatsotella Community Centre</h2>
-        <p>Loading your community app...</p>
-        <div class="loading-spinner"></div>
-    </div>
-
-    <!-- Header -->
-    <div class="header">
-        <h1>🏢 Reyatsotella Community Centre</h1>
-        <p>Stay connected with your community - Anytime, Anywhere</p>
-        <div id="status-indicator" class="status-indicator status-offline">
-            <span id="status-icon">📱</span>
-            <span id="status-text">Offline Mode - Data will sync when online</span>
-        </div>
-    </div>
-
-    <!-- Navigation -->
-    <div class="nav-tabs">
-        <button class="nav-tab active" onclick="showSection('home')" data-tab="home">
-            <i data-lucide="home"></i>
-            <span>Home</span>
-        </button>
-        <button class="nav-tab" onclick="showSection('announcements')" data-tab="announcements">
-            <i data-lucide="megaphone"></i>
-            <span>Announcements</span>
-        </button>
-        <button class="nav-tab" onclick="showSection('events')" data-tab="events">
-            <i data-lucide="calendar"></i>
-            <span>Events</span>
-        </button>
-        <button class="nav-tab" onclick="showSection('messages')" data-tab="messages">
-            <i data-lucide="message-circle"></i>
-            <span>Messages</span>
-        </button>
-        <button class="nav-tab" onclick="showSection('directory')" data-tab="directory">
-            <i data-lucide="users"></i>
-            <span>Directory</span>
-        </button>
-        <button class="nav-tab" onclick="showSection('documents')" data-tab="documents">
-            <i data-lucide="file-text"></i>
-            <span>Documents</span>
-        </button>
-        <button class="nav-tab admin-only" onclick="showSection('admin')" data-tab="admin" style="display: none;">
-            <i data-lucide="settings"></i>
-            <span>Admin</span>
-        </button>
-    </div>
-
-    <!-- Content Sections -->
-    <div id="home" class="content-section active">
-        <div class="card">
-            <h3>🏠 Welcome to Reyatsotella Community Centre</h3>
-            <p>Welcome to your community's digital hub! This app helps you stay connected with announcements, events, and fellow community members.</p>
-        </div>
-        
-        <div id="user-welcome" class="card hidden">
-            <h3>Welcome back, <span id="user-name-display"></span>!</h3>
-            <p>You're now logged in as a member of our community. Use the tabs above to access different features.</p>
-            <button class="btn btn-danger" onclick="logout()">Logout</button>
-        </div>
-        
-        <div id="admin-welcome" class="card hidden">
-            <h3>Admin Dashboard</h3>
-            <p>Welcome to the admin panel. You have full access to manage announcements, events, members, and community content.</p>
-            <div class="admin-settings">
-                <h4>Quick Admin Actions:</h4>
-                <div class="settings-grid">
-                    <button class="btn btn-primary" onclick="showSection('announcements'); scrollToPostForm()">
-                        <i data-lucide="plus"></i> New Announcement
-                    </button>
-                    <button class="btn btn-success" onclick="showSection('events')">
-                        <i data-lucide="calendar"></i> Manage Events
-                    </button>
-                    <button class="btn btn-secondary" onclick="showSection('directory')">
-                        <i data-lucide="users"></i> Member Directory
-                    </button>
-                    <button class="btn btn-warning" onclick="showSection('admin')">
-                        <i data-lucide="settings"></i> Admin Settings
-                    </button>
-                </div>
-            </div>
-            <button class="btn btn-danger" onclick="logout()">Logout</button>
-        </div>
-    </div>
-
-    <!-- Authentication Section -->
-    <div id="auth" class="auth-container">
-        <!-- Tab Navigation -->
-        <div class="nav-tabs" style="margin-bottom: 2rem;">
-            <button class="nav-tab active" onclick="showAuthForm('login')">Member Login</button>
-            <button class="nav-tab" onclick="showAuthForm('admin')">Admin Login</button>
-            <button class="nav-tab" onclick="showAuthForm('register')">Register</button>
-        </div>
-
-        <!-- Login Form -->
-        <div id="login" class="auth-form active">
-            <h3>Member Login</h3>
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="login-membership">Membership Number</label>
-                    <input type="text" id="login-membership" placeholder="e.g., REYA001" required>
-                </div>
-                <div class="form-group">
-                    <label for="login-phone">Phone Number</label>
-                    <input type="tel" id="login-phone" placeholder="+27..." required>
-                </div>
-                <button type="submit" class="btn btn-primary">Login</button>
-            </form>
-        </div>
-
-        <!-- Admin Login Form -->
-        <div id="admin" class="auth-form">
-            <h3>Admin Login</h3>
-            <div class="security-notice">
-                <h4>🔒 Secure Admin Access</h4>
-                <p>Only authorized administrators should access this area.</p>
-            </div>
-            <form id="admin-form">
-                <div class="form-group">
-                    <label for="admin-username">Username</label>
-                    <input type="text" id="admin-username" placeholder="Enter admin username" required>
-                </div>
-                <div class="form-group">
-                    <label for="admin-password">Password</label>
-                    <input type="password" id="admin-password" placeholder="Enter password" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Login as Admin</button>
-            </form>
-        </div>
-
-        <!-- Registration Form -->
-        <div id="register" class="auth-form">
-            <h3>Member Registration</h3>
-            <form id="register-form">
-                <div class="form-group">
-                    <label for="reg-name">Full Name *</label>
-                    <input type="text" id="reg-name" placeholder="Enter your full name" required>
-                </div>
-                <div class="form-group">
-                    <label for="reg-membership-number">Membership Number *</label>
-                    <input type="text" id="reg-membership-number" placeholder="e.g., REYA001" required>
-                </div>
-                <div class="form-group">
-                    <label for="reg-phone">Phone Number *</label>
-                    <input type="tel" id="reg-phone" placeholder="+27..." required>
-                </div>
-                <div class="form-group">
-                    <label for="reg-address">Address</label>
-                    <input type="text" id="reg-address" placeholder="Your address (optional)">
-                </div>
-                <div class="form-group">
-                    <label for="reg-emergency-contact">Emergency Contact</label>
-                    <input type="text" id="reg-emergency-contact" placeholder="Name and phone (optional)">
-                </div>
-                <button type="submit" class="btn btn-success">Register</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Announcements Section -->
-    <div id="announcements" class="content-section">
-        <div class="card">
-            <h3>📢 Community Announcements</h3>
-            <p>Stay updated with the latest news and important information from the community centre.</p>
-        </div>
-
-        <!-- Admin: Add Announcement Form -->
-        <div id="announcement-form" class="card admin-only" style="display: none;">
-            <h3>Post New Announcement</h3>
-            <form id="new-announcement-form">
-                <div class="form-group">
-                    <label for="announcement-title">Title *</label>
-                    <input type="text" id="announcement-title" placeholder="Announcement title" required>
-                </div>
-                <div class="form-group">
-                    <label for="announcement-content">Content *</label>
-                    <textarea id="announcement-content" rows="5" placeholder="Enter announcement details..." required></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Post Announcement</button>
-            </form>
-        </div>
-
-        <!-- Announcements List -->
-        <div id="announcements-list">
-            <!-- Announcements will be loaded here -->
-        </div>
-    </div>
-
-    <!-- Events Section -->
-    <div id="events" class="content-section">
-        <div class="card">
-            <h3>📅 Community Events</h3>
-            <p>Discover upcoming events and activities in our community.</p>
-        </div>
-
-        <!-- Admin: Add Event Form -->
-        <div id="event-form" class="card admin-only" style="display: none;">
-            <h3>Add New Event</h3>
-            <form id="new-event-form">
-                <div class="form-group">
-                    <label for="event-title">Event Title *</label>
-                    <input type="text" id="event-title" placeholder="Event name" required>
-                </div>
-                <div class="form-group">
-                    <label for="event-date">Date & Time *</label>
-                    <input type="datetime-local" id="event-date" required>
-                </div>
-                <div class="form-group">
-                    <label for="event-location">Location *</label>
-                    <input type="text" id="event-location" placeholder="Event location" required>
-                </div>
-                <div class="form-group">
-                    <label for="event-description">Description *</label>
-                    <textarea id="event-description" rows="4" placeholder="Event details..." required></textarea>
-                </div>
-                <button type="submit" class="btn btn-success">Create Event</button>
-            </form>
-        </div>
-
-        <!-- Events List -->
-        <div id="events-list">
-            <!-- Events will be loaded here -->
-        </div>
-    </div>
-
-    <!-- Messages Section -->
-    <div id="messages" class="content-section">
-        <div class="card">
-            <h3>💬 Community Messages</h3>
-            <p>Share messages with your community members.</p>
-        </div>
-
-        <!-- Admin: Send Message -->
-        <div id="message-form" class="card admin-only" style="display: none;">
-            <h3>Send Community Message</h3>
-            <form id="new-message-form">
-                <div class="form-group">
-                    <label for="message-title">Title *</label>
-                    <input type="text" id="message-title" placeholder="Message title" required>
-                </div>
-                <div class="form-group">
-                    <label for="message-content">Message *</label>
-                    <textarea id="message-content" rows="4" placeholder="Enter your message..." required></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Send Message</button>
-            </form>
-        </div>
-
-        <!-- Messages List -->
-        <div id="messages-list">
-            <!-- Messages will be loaded here -->
-        </div>
-    </div>
-
-    <!-- Directory Section -->
-    <div id="directory" class="content-section">
-        <div class="card">
-            <h3>👥 Member Directory</h3>
-            <p>Connect with fellow community members. <em>Note: Contact details are protected for privacy.</em></p>
-        </div>
-
-        <div class="card">
-            <h4>Search Members</h4>
-            <input type="text" id="member-search" placeholder="Search by name or membership number..." style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 8px; margin-bottom: 1rem;">
-        </div>
-
-        <div id="directory-list">
-            <!-- Member directory will be loaded here -->
-        </div>
-    </div>
-
-    <!-- Documents Section -->
-    <div id="documents" class="content-section">
-        <div class="card">
-            <h3>📄 Community Documents</h3>
-            <p>Important documents and resources for the community.</p>
-        </div>
-
-        <!-- Admin: Add Document -->
-        <div id="document-form" class="card admin-only" style="display: none;">
-            <h3>Add New Document</h3>
-            <form id="new-document-form">
-                <div class="form-group">
-                    <label for="document-title">Document Title *</label>
-                    <input type="text" id="document-title" placeholder="Document name" required>
-                </div>
-                <div class="form-group">
-                    <label for="document-description">Description</label>
-                    <textarea id="document-description" rows="3" placeholder="Document description (optional)"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="document-file">Document Link</label>
-                    <input type="url" id="document-file" placeholder="https://example.com/document.pdf" required>
-                </div>
-                <button type="submit" class="btn btn-secondary">Add Document</button>
-            </form>
-        </div>
-
-        <!-- Documents List -->
-        <div id="documents-list">
-            <!-- Documents will be loaded here -->
-        </div>
-    </div>
-
-    <!-- Admin Section -->
-    <div id="admin-section" class="content-section">
-        <div class="card">
-            <h3>⚙️ Admin Dashboard</h3>
-            <p>Manage your community centre's digital presence.</p>
-        </div>
-
-        <!-- Quick Stats -->
-        <div class="admin-settings">
-            <h4>Community Statistics</h4>
-            <div class="settings-grid">
-                <div class="card">
-                    <h5>Total Members</h5>
-                    <div id="stats-members" style="font-size: 2rem; color: var(--primary-red);">0</div>
-                </div>
-                <div class="card">
-                    <h5>Total Announcements</h5>
-                    <div id="stats-announcements" style="font-size: 2rem; color: var(--primary-red);">0</div>
-                </div>
-                <div class="card">
-                    <h5>Upcoming Events</h5>
-                    <div id="stats-events" style="font-size: 2rem; color: var(--primary-red);">0</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Data Management -->
-        <div class="card">
-            <h4>Data Management</h4>
-            <p>Backup and manage your community data.</p>
-            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
-                <button class="btn btn-secondary" onclick="exportData()">
-                    <i data-lucide="download"></i> Export Data
-                </button>
-                <button class="btn btn-danger" onclick="clearAllData()">
-                    <i data-lucide="trash-2"></i> Clear All Data
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scripts -->
-    <script>
-        // Reya Tsotella Community Centre - Fixed Secure App JavaScript
-        class ReyaCommunityApp {
-            constructor() {
-                this.currentUser = null;
-                this.isAdmin = false;
-                this.members = [];
-                this.announcements = [];
-                this.events = [];
-                this.messages = [];
-                this.documents = [];
-                this.comments = [];
-                this.init();
-            }
-
-            init() {
-                // Initialize Lucide icons
-                if (typeof lucide !== 'undefined') {
-                    lucide.createIcons();
-                }
-
-                // Load data from localStorage
-                this.loadData();
-                
-                // Check if user is logged in
-                this.checkUserSession();
-                
-                // Setup event listeners
-                this.setupEventListeners();
-                
-                // Setup PWA features
-                this.setupPWA();
-                
-                // Hide loading screen
-                setTimeout(() => {
-                    document.getElementById('loading-screen').style.display = 'none';
-                }, 2000);
-
-                // Update status indicator
-                this.updateOnlineStatus();
-                
-                // Load content
-                this.loadContent();
-            }
-
-            setupEventListeners() {
-                // Authentication forms
-                document.getElementById('login-form').addEventListener('submit', (e) => this.handleLogin(e));
-                document.getElementById('admin-form').addEventListener('submit', (e) => this.handleAdminLogin(e));
-                document.getElementById('register-form').addEventListener('submit', (e) => this.handleRegistration(e));
-                
-                // Content forms
-                document.getElementById('new-announcement-form').addEventListener('submit', (e) => this.handleNewAnnouncement(e));
-                document.getElementById('new-event-form').addEventListener('submit', (e) => this.handleNewEvent(e));
-                document.getElementById('new-message-form').addEventListener('submit', (e) => this.handleNewMessage(e));
-                document.getElementById('new-document-form').addEventListener('submit', (e) => this.handleNewDocument(e));
-                
-                // Search
-                document.getElementById('member-search').addEventListener('input', (e) => this.searchMembers(e.target.value));
-                
-                // Online status
-                window.addEventListener('online', () => this.updateOnlineStatus());
-                window.addEventListener('offline', () => this.updateOnlineStatus());
-            }
-
-            setupPWA() {
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.register('sw.js').catch(console.error);
-                }
-            }
-
-            updateOnlineStatus() {
-                const indicator = document.getElementById('status-indicator');
-                const icon = document.getElementById('status-icon');
-                const text = document.getElementById('status-text');
-                
-                if (navigator.onLine) {
-                    indicator.className = 'status-indicator status-online';
-                    icon.textContent = '🌐';
-                    text.textContent = 'Online - Data syncing';
-                } else {
-                    indicator.className = 'status-indicator status-offline';
-                    icon.textContent = '📱';
-                    text.textContent = 'Offline Mode - Data will sync when online';
-                }
-            }
-
-            checkUserSession() {
-                const session = localStorage.getItem('reyaUserSession');
-                if (session) {
-                    const userData = JSON.parse(session);
-                    if (userData.type === 'admin') {
-                        this.loginAsAdmin();
-                    } else if (userData.member) {
-                        this.loginAsMember(userData.member);
-                    }
-                }
-            }
-
-            handleLogin(e) {
-                e.preventDefault();
-                
-                const membershipNumber = document.getElementById('login-membership').value.trim();
-                const phone = document.getElementById('login-phone').value.trim();
-                
-                const member = this.members.find(m => 
-                    m.membershipNumber === membershipNumber && m.phone === phone
-                );
-                
-                if (member) {
-                    this.loginAsMember(member);
-                    this.showAlert('Login successful! Welcome back.', 'success');
-                } else {
-                    this.showAlert('Invalid credentials. Please check your membership number and phone number.', 'error');
-                }
-            }
-
-            handleAdminLogin(e) {
-                e.preventDefault();
-                
-                const username = document.getElementById('admin-username').value.trim();
-                const password = document.getElementById('admin-password').value;
-                
-                // Simple admin authentication
-                if (username === 'reyatsotella-admin' && password === 'Reyatsotella2025!') {
-                    this.loginAsAdmin();
-                    this.showAlert('Admin login successful!', 'success');
-                } else {
-                    this.showAlert('Invalid admin credentials.', 'error');
-                }
-            }
-
-            handleRegistration(e) {
-                e.preventDefault();
-                
-                const formData = {
-                    name: document.getElementById('reg-name').value.trim(),
-                    membershipNumber: document.getElementById('reg-membership-number').value.trim(),
-                    phone: document.getElementById('reg-phone').value.trim(),
-                    address: document.getElementById('reg-address').value.trim(),
-                    emergencyContact: document.getElementById('reg-emergency-contact').value.trim()
-                };
-                
-                // Check if membership number already exists
-                const existing = this.members.find(m => m.membershipNumber === formData.membershipNumber);
-                if (existing) {
-                    this.showAlert('This membership number is already registered.', 'error');
-                    return;
-                }
-                
-                // Add new member
-                const member = {
-                    id: 'member_' + Date.now(),
-                    ...formData,
-                    registeredAt: Date.now(),
-                    status: 'active'
-                };
-                
-                this.members.push(member);
-                this.saveData();
-                
-                this.showAlert('Registration successful! You can now login.', 'success');
-                
-                // Clear form
-                document.getElementById('register-form').reset();
-                
-                // Switch to login tab
-                this.showAuthForm('login');
-            }
-
-            loginAsMember(member) {
-                this.currentUser = member;
-                this.isAdmin = false;
-                
-                // Update UI
-                document.getElementById('auth').style.display = 'none';
-                document.getElementById('user-welcome').classList.remove('hidden');
-                document.getElementById('user-name-display').textContent = member.name;
-                
-                // Save session
-                localStorage.setItem('reyaUserSession', JSON.stringify({
-                    type: 'member',
-                    member: member
-                }));
-            }
-
-            loginAsAdmin() {
-                this.currentUser = { name: 'Administrator', type: 'admin' };
-                this.isAdmin = true;
-                
-                // Update UI
-                document.getElementById('auth').style.display = 'none';
-                document.getElementById('admin-welcome').classList.remove('hidden');
-                
-                // Show admin features
-                document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
-                
-                // Save session
-                localStorage.setItem('reyaUserSession', JSON.stringify({
-                    type: 'admin'
-                }));
-            }
-
-            logout() {
-                this.currentUser = null;
-                this.isAdmin = false;
-                
-                // Clear session
-                localStorage.removeItem('reyaUserSession');
-                
-                // Reset UI
-                document.getElementById('auth').style.display = 'block';
-                document.getElementById('user-welcome').classList.add('hidden');
-                document.getElementById('admin-welcome').classList.add('hidden');
-                document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-                
-                // Clear forms
-                document.querySelectorAll('form').forEach(form => form.reset());
-                
-                // Show auth section
-                this.showAuthForm('login');
-            }
-
-            // Data management
-            loadData() {
-                this.members = JSON.parse(localStorage.getItem('reyaMembers') || '[]');
-                this.announcements = JSON.parse(localStorage.getItem('reyaAnnouncements') || '[]');
-                this.events = JSON.parse(localStorage.getItem('reyaEvents') || '[]');
-                this.messages = JSON.parse(localStorage.getItem('reyaMessages') || '[]');
-                this.documents = JSON.parse(localStorage.getItem('reyaDocuments') || '[]');
-                this.comments = JSON.parse(localStorage.getItem('reyaComments') || '[]');
-                
-                // Initialize with sample data if empty
-                if (this.announcements.length === 0) {
-                    this.announcements.push({
-                        id: 'ann1',
-                        title: 'Welcome to Reya Tsotella Community App',
-                        content: 'Welcome to our new community application! This app will help us stay connected and share important information. Please register and start using the features.',
-                        date: Date.now(),
-                        author: 'System',
-                        approved: true
-                    });
-                }
-            }
-
-            saveData() {
-                localStorage.setItem('reyaMembers', JSON.stringify(this.members));
-                localStorage.setItem('reyaAnnouncements', JSON.stringify(this.announcements));
-                localStorage.setItem('reyaEvents', JSON.stringify(this.events));
-                localStorage.setItem('reyaMessages', JSON.stringify(this.messages));
-                localStorage.setItem('reyaDocuments', JSON.stringify(this.documents));
-                localStorage.setItem('reyaComments', JSON.stringify(this.comments));
-            }
-
-            loadContent() {
-                this.loadAnnouncements();
-                this.loadEvents();
-                this.loadMessages();
-                this.loadDocuments();
-                this.loadDirectory();
-                this.loadStats();
-            }
-
-            showAlert(message, type = 'info') {
-                const alertDiv = document.createElement('div');
-                alertDiv.className = `alert alert-${type}`;
-                alertDiv.innerHTML = `
-                    <i data-lucide="alert-circle"></i>
-                    ${message}
-                `;
-                
-                const container = document.querySelector('.content-section.active') || document.body;
-                container.insertBefore(alertDiv, container.firstChild);
-                
-                if (typeof lucide !== 'undefined') {
-                    lucide.createIcons();
-                }
-                
-                setTimeout(() => alertDiv.remove(), 5000);
-            }
-
-            // Content Management
-            loadAnnouncements() {
-                this.announcements.sort((a, b) => b.date - a.date);
-                
-                const container = document.getElementById('announcements-list');
-                container.innerHTML = '';
-                
-                if (this.announcements.length === 0) {
-                    container.innerHTML = '<div class="card"><p>No announcements yet.</p></div>';
-                    return;
-                }
-                
-                for (const announcement of this.announcements) {
-                    const announcementDiv = document.createElement('div');
-                    announcementDiv.className = 'card';
-                    announcementDiv.innerHTML = `
-                        <h3>${announcement.title}</h3>
-                        <div class="card-meta">Posted on ${new Date(announcement.date).toLocaleDateString()} by ${announcement.author}</div>
-                        <p>${announcement.content}</p>
-                        <div class="comment-actions">
-                            <button class="btn btn-secondary" onclick="toggleComments('${announcement.id}')">
-                                <i data-lucide="message-circle"></i> Comments (<span id="comment-count-${announcement.id}">0</span>)
-                            </button>
-                        </div>
-                        <div id="comments-${announcement.id}" class="hidden" style="margin-top: 1rem;">
-                            <div class="card">
-                                <h4>Comments</h4>
-                                <div id="comments-list-${announcement.id}">
-                                    <!-- Comments will be loaded here -->
-                                </div>
-                                ${this.currentUser && !this.isAdmin ? `
-                                <form id="comment-form-${announcement.id}" onsubmit="app.addCommentToAnnouncement('${announcement.id}', event)" style="margin-top: 1rem;">
-                                    <div class="form-group">
-                                        <label>Add Comment</label>
-                                        <textarea id="comment-text-${announcement.id}" rows="2" placeholder="Share your thoughts..." required></textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Post Comment</button>
-                                </form>
-                                ` : ''}
-                            </div>
-                        </div>
-                    `;
-                    container.appendChild(announcementDiv);
-                    
-                    // Load comments count
-                    this.loadCommentsCount(announcement.id);
-                }
-                
-                if (typeof lucide !== 'undefined') {
-                    lucide.createIcons();
-                }
-            }
-
-            loadCommentsCount(announcementId) {
-                const announcementComments = this.comments.filter(c => c.announcementId === announcementId);
-                const countElement = document.getElementById(`comment-count-${announcementId}`);
-                if (countElement) {
-                    countElement.textContent = announcementComments.length;
-                }
-            }
-
-            loadComments(announcementId) {
-                const announcementComments = this.comments.filter(c => c.announcementId === announcementId);
-                announcementComments.sort((a, b) => a.date - b.date);
-                
-                const container = document.getElementById(`comments-list-${announcementId}`);
-                container.innerHTML = '';
-                
-                if (announcementComments.length === 0) {
-                    container.innerHTML = '<p>No comments yet.</p>';
-                    return;
-                }
-                
-                for (const comment of announcementComments) {
-                    const commentDiv = document.createElement('div');
-                    commentDiv.className = 'comment';
-                    commentDiv.innerHTML = `
-                        <div class="comment-author">${comment.authorName}</div>
-                        <div class="comment-content">${comment.content}</div>
-                        <div class="comment-time">${new Date(comment.date).toLocaleString()}</div>
-                        ${this.isAdmin ? `
-                        <div class="comment-actions" style="margin-top: 0.5rem;">
-                            <button class="btn btn-danger" onclick="app.deleteComment('${comment.id}', '${announcementId}')">
-                                <i data-lucide="trash-2"></i> Delete
-                            </button>
-                        </div>
-                        ` : ''}
-                    `;
-                    container.appendChild(commentDiv);
-                }
-            }
-
-            addCommentToAnnouncement(announcementId, event) {
-                event.preventDefault();
-                
-                if (!this.currentUser || this.isAdmin) return;
-                
-                const commentText = document.getElementById(`comment-text-${announcementId}`).value.trim();
-                if (!commentText) return;
-                
-                const comment = {
-                    id: 'comment_' + Date.now(),
-                    announcementId: announcementId,
-                    content: commentText,
-                    authorId: this.currentUser.id,
-                    authorName: this.currentUser.name,
-                    date: Date.now(),
-                    approved: true
-                };
-                
-                this.comments.push(comment);
-                this.saveData();
-                
-                document.getElementById(`comment-text-${announcementId}`).value = '';
-                this.loadComments(announcementId);
-                this.loadCommentsCount(announcementId);
-                this.showAlert('Comment posted successfully!', 'success');
-            }
-
-            deleteComment(commentId, announcementId) {
-                if (!this.isAdmin) return;
-                
-                this.comments = this.comments.filter(c => c.id !== commentId);
-                this.saveData();
-                
-                this.loadComments(announcementId);
-                this.loadCommentsCount(announcementId);
-                this.showAlert('Comment deleted.', 'success');
-            }
-
-            loadEvents() {
-                this.events.sort((a, b) => a.date - b.date);
-                
-                const container = document.getElementById('events-list');
-                container.innerHTML = '';
-                
-                if (this.events.length === 0) {
-                    container.innerHTML = '<div class="card"><p>No events scheduled yet.</p></div>';
-                    return;
-                }
-                
-                for (const event of this.events) {
-                    const eventDiv = document.createElement('div');
-                    eventDiv.className = 'card';
-                    eventDiv.innerHTML = `
-                        <h3>${event.title}</h3>
-                        <div class="card-meta">
-                            <i data-lucide="calendar"></i> ${new Date(event.date).toLocaleString()}
-                            <br>
-                            <i data-lucide="map-pin"></i> ${event.location}
-                        </div>
-                        <p>${event.description}</p>
-                        ${this.isAdmin ? `
-                        <div class="comment-actions">
-                            <button class="btn btn-danger" onclick="app.deleteEvent('${event.id}')">
-                                <i data-lucide="trash-2"></i> Delete
-                            </button>
-                        </div>
-                        ` : ''}
-                    `;
-                    container.appendChild(eventDiv);
-                }
-                
-                if (typeof lucide !== 'undefined') {
-                    lucide.createIcons();
-                }
-            }
-
-            loadMessages() {
-                this.messages.sort((a, b) => b.date - a.date);
-                
-                const container = document.getElementById('messages-list');
-                container.innerHTML = '';
-                
-                if (this.messages.length === 0) {
-                    container.innerHTML = '<div class="card"><p>No messages yet.</p></div>';
-                    return;
-                }
-                
-                for (const message of this.messages) {
-                    const messageDiv = document.createElement('div');
-                    messageDiv.className = 'card';
-                    messageDiv.innerHTML = `
-                        <h3>${message.title}</h3>
-                        <div class="card-meta">Sent on ${new Date(message.date).toLocaleDateString()}</div>
-                        <p>${message.content}</p>
-                        ${this.isAdmin ? `
-                        <div class="comment-actions">
-                            <button class="btn btn-danger" onclick="app.deleteMessage('${message.id}')">
-                                <i data-lucide="trash-2"></i> Delete
-                            </button>
-                        </div>
-                        ` : ''}
-                    `;
-                    container.appendChild(messageDiv);
-                }
-            }
-
-            loadDocuments() {
-                const container = document.getElementById('documents-list');
-                container.innerHTML = '';
-                
-                if (this.documents.length === 0) {
-                    container.innerHTML = '<div class="card"><p>No documents available yet.</p></div>';
-                    return;
-                }
-                
-                for (const document of this.documents) {
-                    const documentDiv = document.createElement('div');
-                    documentDiv.className = 'card';
-                    documentDiv.innerHTML = `
-                        <h3>${document.title}</h3>
-                        ${document.description ? `<p>${document.description}</p>` : ''}
-                        <div class="comment-actions">
-                            <a href="${document.fileUrl}" target="_blank" class="btn btn-primary">
-                                <i data-lucide="external-link"></i> View Document
-                            </a>
-                            ${this.isAdmin ? `
-                            <button class="btn btn-danger" onclick="app.deleteDocument('${document.id}')">
-                                <i data-lucide="trash-2"></i> Delete
-                            </button>
-                            ` : ''}
-                        </div>
-                    `;
-                    container.appendChild(documentDiv);
-                }
-                
-                if (typeof lucide !== 'undefined') {
-                    lucide.createIcons();
-                }
-            }
-
-            loadDirectory() {
-                this.members.sort((a, b) => a.name.localeCompare(b.name));
-                const container = document.getElementById('directory-list');
-                this.renderDirectory(this.members, container);
-            }
-
-            renderDirectory(members, container) {
-                container.innerHTML = '';
-                
-                if (members.length === 0) {
-                    container.innerHTML = '<div class="card"><p>No members registered yet.</p></div>';
-                    return;
-                }
-                
-                for (const member of members) {
-                    const memberDiv = document.createElement('div');
-                    memberDiv.className = 'member-card';
-                    memberDiv.innerHTML = `
-                        <div class="member-info">
-                            <h4>${member.name}</h4>
-                            <div class="member-meta">Member: ${member.membershipNumber}</div>
-                            <div class="member-meta">Registered: ${new Date(member.registeredAt).toLocaleDateString()}</div>
-                        </div>
-                        <div class="contact-info">
-                            ${this.isAdmin ? `
-                                <div><strong>Phone:</strong> ${member.phone}</div>
-                                ${member.address ? `<div><strong>Address:</strong> ${member.address}</div>` : ''}
-                                ${member.emergencyContact ? `<div><strong>Emergency:</strong> ${member.emergencyContact}</div>` : ''}
-                            ` : `
-                                <em>Contact details protected</em>
-                            `}
-                        </div>
-                    `;
-                    container.appendChild(memberDiv);
-                }
-            }
-
-            searchMembers(query) {
-                if (!query.trim()) {
-                    this.renderDirectory(this.members, document.getElementById('directory-list'));
-                    return;
-                }
-                
-                const searchTerm = query.toLowerCase();
-                const filteredMembers = this.members.filter(member => 
-                    member.name.toLowerCase().includes(searchTerm) ||
-                    member.membershipNumber.toLowerCase().includes(searchTerm)
-                );
-                
-                this.renderDirectory(filteredMembers, document.getElementById('directory-list'));
-            }
-
-            loadStats() {
-                if (!this.isAdmin) return;
-                
-                document.getElementById('stats-members').textContent = this.members.length;
-                document.getElementById('stats-announcements').textContent = this.announcements.length;
-                document.getElementById('stats-events').textContent = this.events.filter(e => e.date > Date.now()).length;
-            }
-
-            // Form Handlers
-            handleNewAnnouncement(e) {
-                e.preventDefault();
-                if (!this.isAdmin) return;
-                
-                const title = document.getElementById('announcement-title').value.trim();
-                const content = document.getElementById('announcement-content').value.trim();
-                
-                const announcement = {
-                    id: 'ann_' + Date.now(),
-                    title,
-                    content,
-                    date: Date.now(),
-                    author: 'Administrator',
-                    approved: true
-                };
-                
-                this.announcements.push(announcement);
-                this.saveData();
-                this.loadAnnouncements();
-                this.loadStats();
-                
-                document.getElementById('new-announcement-form').reset();
-                this.showAlert('Announcement posted successfully!', 'success');
-            }
-
-            handleNewEvent(e) {
-                e.preventDefault();
-                if (!this.isAdmin) return;
-                
-                const title = document.getElementById('event-title').value.trim();
-                const date = new Date(document.getElementById('event-date').value).getTime();
-                const location = document.getElementById('event-location').value.trim();
-                const description = document.getElementById('event-description').value.trim();
-                
-                const event = {
-                    id: 'event_' + Date.now(),
-                    title,
-                    date,
-                    location,
-                    description,
-                    createdBy: 'Administrator'
-                };
-                
-                this.events.push(event);
-                this.saveData();
-                this.loadEvents();
-                this.loadStats();
-                
-                document.getElementById('new-event-form').reset();
-                this.showAlert('Event created successfully!', 'success');
-            }
-
-            handleNewMessage(e) {
-                e.preventDefault();
-                if (!this.isAdmin) return;
-                
-                const title = document.getElementById('message-title').value.trim();
-                const content = document.getElementById('message-content').value.trim();
-                
-                const message = {
-                    id: 'msg_' + Date.now(),
-                    title,
-                    content,
-                    date: Date.now(),
-                    sentBy: 'Administrator'
-                };
-                
-                this.messages.push(message);
-                this.saveData();
-                this.loadMessages();
-                
-                document.getElementById('new-message-form').reset();
-                this.showAlert('Message sent successfully!', 'success');
-            }
-
-            handleNewDocument(e) {
-                e.preventDefault();
-                if (!this.isAdmin) return;
-                
-                const title = document.getElementById('document-title').value.trim();
-                const description = document.getElementById('document-description').value.trim();
-                const fileUrl = document.getElementById('document-file').value.trim();
-                
-                const document = {
-                    id: 'doc_' + Date.now(),
-                    title,
-                    description,
-                    fileUrl,
-                    addedBy: 'Administrator',
-                    addedDate: Date.now()
-                };
-                
-                this.documents.push(document);
-                this.saveData();
-                this.loadDocuments();
-                
-                document.getElementById('new-document-form').reset();
-                this.showAlert('Document added successfully!', 'success');
-            }
-
-            // Utility Methods
-            deleteEvent(eventId) {
-                if (!this.isAdmin) return;
-                
-                this.events = this.events.filter(e => e.id !== eventId);
-                this.saveData();
-                this.loadEvents();
-                this.loadStats();
-                this.showAlert('Event deleted.', 'success');
-            }
-
-            deleteMessage(messageId) {
-                if (!this.isAdmin) return;
-                
-                this.messages = this.messages.filter(m => m.id !== messageId);
-                this.saveData();
-                this.loadMessages();
-                this.showAlert('Message deleted.', 'success');
-            }
-
-            deleteDocument(documentId) {
-                if (!this.isAdmin) return;
-                
-                this.documents = this.documents.filter(d => d.id !== documentId);
-                this.saveData();
-                this.loadDocuments();
-                this.showAlert('Document deleted.', 'success');
-            }
-
-            exportData() {
-                const data = {
-                    members: this.members,
-                    announcements: this.announcements,
-                    events: this.events,
-                    messages: this.messages,
-                    documents: this.documents
-                };
-                
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `reya-community-backup-${new Date().toISOString().split('T')[0]}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                this.showAlert('Data exported successfully!', 'success');
-            }
-
-            clearAllData() {
-                if (!confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
-                    return;
-                }
-                
-                this.members = [];
-                this.announcements = [];
-                this.events = [];
-                this.messages = [];
-                this.documents = [];
-                this.comments = [];
-                
-                localStorage.clear();
-                
-                // Re-initialize with sample data
-                this.loadData();
-                this.loadContent();
-                
-                this.showAlert('All data cleared successfully!', 'success');
-            }
-        }
-
-        // Global functions
-        let app;
-
-        function showSection(sectionId) {
-            // Hide all sections
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            // Remove active class from all tabs
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Show selected section
-            document.getElementById(sectionId).classList.add('active');
-            
-            // Add active class to clicked tab
-            document.querySelector(`[data-tab="${sectionId}"]`).classList.add('active');
-        }
-
-        function showAuthForm(formType) {
-            // Hide all auth forms
-            document.querySelectorAll('.auth-form').forEach(form => {
-                form.classList.remove('active');
-            });
-            
-            // Remove active class from all auth tabs
-            document.querySelectorAll('.auth-container .nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Show selected form
-            document.getElementById(formType).classList.add('active');
-            
-            // Add active class to clicked tab
-            event.target.classList.add('active');
-        }
-
-        function toggleComments(announcementId) {
-            const commentsSection = document.getElementById(`comments-${announcementId}`);
-            if (commentsSection) {
-                commentsSection.classList.toggle('hidden');
-                if (!commentsSection.classList.contains('hidden')) {
-                    app.loadComments(announcementId);
-                }
-            }
-        }
-
-        function scrollToPostForm() {
-            const form = document.getElementById('announcement-form');
-            if (form) {
-                form.scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-
-        function logout() {
-            if (app) {
-                app.logout();
-            }
-        }
-
-        // Initialize app when page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            app = new ReyaCommunityApp();
-        });
-    </script>
+<!-- Loading Screen -->
+<div id="loading-screen">
+<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23FFFFFF'/%3E%3Cpath d='M20 20L80 20L80 80L20 80Z' fill='%23BF151B'/%3E%3Ccircle cx='35' cy='35' r='8' fill='%23FFFFFF'/%3E%3Ccircle cx='50' cy='35' r='8' fill='%23FFFFFF'/%3E%3Ccircle cx='65' cy='35' r='8' fill='%23FFFFFF'/%3E%3Ctext x='50' y='70' text-anchor='middle' fill='%23BF151B' font-family='Arial' font-size='12' font-weight='bold'%3EREYA%3C/text%3E%3C/svg%3E" alt="Reyatsotella Logo">
+<h2>Reyatsotella Community Centre</h2>
+<p>Loading your community app...</p>
+<div class="loading-spinner"></div>
+</div>
+<!-- Header -->
+<div class="header">
+<h1>🏢 Reyatsotella Community Centre</h1>
+<p>Stay connected with your community - Anytime, Anywhere</p>
+<div id="status-indicator" class="status-indicator status-offline">
+<span id="status-icon">📱</span>
+<span id="status-text">Offline Mode - Data will sync when online</span>
+</div>
+</div>
+<!-- Navigation -->
+<div class="nav-tabs">
+<button class="nav-tab active" onclick="showSection('home')" data-tab="home">
+<i data-lucide="home"></i>
+<span>Home</span>
+</button>
+<button class="nav-tab" onclick="showSection('announcements')" data-tab="announcements">
+<i data-lucide="megaphone"></i>
+<span>Announcements</span>
+</button>
+<button class="nav-tab" onclick="showSection('events')" data-tab="events">
+<i data-lucide="calendar"></i>
+<span>Events</span>
+</button>
+<button class="nav-tab" onclick="showSection('messages')" data-tab="messages">
+<i data-lucide="message-circle"></i>
+<span>Messages</span>
+</button>
+<button class="nav-tab" onclick="showSection('directory')" data-tab="directory">
+<i data-lucide="users"></i>
+<span>Directory</span>
+</button>
+<button class="nav-tab" onclick="showSection('documents')" data-tab="documents">
+<i data-lucide="file-text"></i>
+<span>Documents</span>
+</button>
+<button class="nav-tab admin-only" onclick="showSection('admin')" data-tab="admin" style="display: none;">
+<i data-lucide="settings"></i>
+<span>Admin</span>
+</button>
+</div>
+<!-- Content Sections -->
+<div id="home" class="content-section active">
+<div class="card">
+<h3>🏠 Welcome to Reyatsotella Community Centre</h3>
+<p>Welcome to your community's digital hub! This app helps you stay connected with announcements, events, and fellow community members.</p>
+</div>
+<div id="user-welcome" class="card hidden">
+<h3>Welcome back, <span id="user-name-display"></span>!</h3>
+<p>You're now logged in as a member of our community. Use the tabs above to access different features.</p>
+<button class="btn btn-danger" onclick="logout()">Logout</button>
+</div>
+<div id="admin-welcome" class="card hidden">
+<h3>Admin Dashboard</h3>
+<p>Welcome to the admin panel. You have full access to manage announcements, events, members, and community content.</p>
+<div class="admin-settings">
+<h4>Quick Admin Actions:</h4>
+<div class="settings-grid">
+<button class="btn btn-primary" onclick="showSection('announcements'); scrollToPostForm()">
+<i data-lucide="plus"></i> New Announcement
+</button>
+<button class="btn btn-success" onclick="showSection('events')">
+<i data-lucide="calendar"></i> Manage Events
+</button>
+<button class="btn btn-secondary" onclick="showSection('directory')">
+<i data-lucide="users"></i> Member Directory
+</button>
+<button class="btn btn-warning" onclick="showSection('admin')">
+<i data-lucide="settings"></i> Admin Settings
+</button>
+</div>
+</div>
+<button class="btn btn-danger" onclick="logout()">Logout</button>
+</div>
+</div>
+<!-- Authentication Section -->
+<div id="auth" class="auth-container">
+<!-- Tab Navigation -->
+<div class="nav-tabs" style="margin-bottom: 2rem;">
+<button class="nav-tab active" onclick="showAuthForm('login')">Member Login</button>
+<button class="nav-tab" onclick="showAuthForm('admin')">Admin Login</button>
+<button class="nav-tab" onclick="showAuthForm('register')">Register</button>
+</div>
+<!-- Login Form -->
+<div id="login" class="auth-form active">
+<h3>Member Login</h3>
+<form id="login-form">
+<div class="form-group">
+<label for="login-membership">Membership Number</label>
+<input type="text" id="login-membership" placeholder="e.g., REYA001" required>
+</div>
+<div class="form-group">
+<label for="login-phone">Phone Number</label>
+<input type="tel" id="login-phone" placeholder="+27..." required>
+</div>
+<button type="submit" class="btn btn-primary">Login</button>
+</form>
+</div>
+<!-- Admin Login Form -->
+<div id="admin" class="auth-form">
+<h3>Admin Login</h3>
+<div class="security-notice">
+<h4>🔒 Secure Admin Access</h4>
+<p>Only authorized administrators should access this area.</p>
+</div>
+<form id="admin-form">
+<div class="form-group">
+<label for="admin-username">Username</label>
+<input type="text" id="admin-username" placeholder="Enter admin username" required>
+</div>
+<div class="form-group">
+<label for="admin-password">Password</label>
+<input type="password" id="admin-password" placeholder="Enter password" required>
+</div>
+<button type="submit" class="btn btn-primary">Login as Admin</button>
+</form>
+</div>
+<!-- Registration Form -->
+<div id="register" class="auth-form">
+<h3>Member Registration</h3>
+<form id="register-form">
+<div class="form-group">
+<label for="reg-name">Full Name *</label>
+<input type="text" id="reg-name" placeholder="Enter your full name" required>
+</div>
+<div class="form-group">
+<label for="reg-membership-number">Membership Number *</label>
+<input type="text" id="reg-membership-number" placeholder="e.g., REYA001" required>
+</div>
+<div class="form-group">
+<label for="reg-phone">Phone Number *</label>
+<input type="tel" id="reg-phone" placeholder="+27..." required>
+</div>
+<div class="form-group">
+<label for="reg-address">Address</label>
+<input type="text" id="reg-address" placeholder="Your address (optional)">
+</div>
+<div class="form-group">
+<label for="reg-emergency-contact">Emergency Contact</label>
+<input type="text" id="reg-emergency-contact" placeholder="Name and phone (optional)">
+</div>
+<button type="submit" class="btn btn-success">Register</button>
+</form>
+</div>
+</div>
+<!-- Announcements Section -->
+<div id="announcements" class="content-section">
+<div class="card">
+<h3>📢 Community Announcements</h3>
+<p>Stay updated with the latest news and important information from the community centre.</p>
+</div>
+<!-- Admin: Add Announcement Form -->
+<div id="announcement-form" class="card admin-only" style="display: none;">
+<h3>Post New Announcement</h3>
+<form id="new-announcement-form">
+<div class="form-group">
+<label for="announcement-title">Title *</label>
+<input type="text" id="announcement-title" placeholder="Announcement title" required>
+</div>
+<div class="form-group">
+<label for="announcement-content">Content *</label>
+<textarea id="announcement-content" rows="5" placeholder="Enter announcement details..." required></textarea>
+</div>
+<button type="submit" class="btn btn-primary">Post Announcement</button>
+</form>
+</div>
+<!-- Announcements List -->
+<div id="announcements-list">
+<!-- Announcements will be loaded here -->
+</div>
+</div>
+<!-- Events Section -->
+<div id="events" class="content-section">
+<div class="card">
+<h3>📅 Community Events</h3>
+<p>Discover upcoming events and activities in our community.</p>
+</div>
+<!-- Admin: Add Event Form -->
+<div id="event-form" class="card admin-only" style="display: none;">
+<h3>Add New Event</h3>
+<form id="new-event-form">
+<div class="form-group">
+<label for="event-title">Event Title *</label>
+<input type="text" id="event-title" placeholder="Event name" required>
+</div>
+<div class="form-group">
+<label for="event-date">Date & Time *</label>
+<input type="datetime-local" id="event-date" required>
+</div>
+<div class="form-group">
+<label for="event-location">Location *</label>
+<input type="text" id="event-location" placeholder="Event location" required>
+</div>
+<div class="form-group">
+<label for="event-description">Description *</label>
+<textarea id="event-description" rows="4" placeholder="Event details..." required></textarea>
+</div>
+<button type="submit" class="btn btn-success">Create Event</button>
+</form>
+</div>
+<!-- Events List -->
+<div id="events-list">
+<!-- Events will be loaded here -->
+</div>
+</div>
+<!-- Messages Section -->
+<div id="messages" class="content-section">
+<div class="card">
+<h3>💬 Community Messages</h3>
+<p>Share messages with your community members.</p>
+</div>
+<!-- Admin: Send Message -->
+<div id="message-form" class="card admin-only" style="display: none;">
+<h3>Send Community Message</h3>
+<form id="new-message-form">
+<div class="form-group">
+<label for="message-title">Title *</label>
+<input type="text" id="message-title" placeholder="Message title" required>
+</div>
+<div class="form-group">
+<label for="message-content">Message *</label>
+<textarea id="message-content" rows="4" placeholder="Enter your message..." required></textarea>
+</div>
+<button type="submit" class="btn btn-primary">Send Message</button>
+</form>
+</div>
+<!-- Messages List -->
+<div id="messages-list">
+<!-- Messages will be loaded here -->
+</div>
+</div>
+<!-- Directory Section -->
+<div id="directory" class="content-section">
+<div class="card">
+<h3>👥 Member Directory</h3>
+<p>Connect with fellow community members. <em>Note: Contact details are protected for privacy.</em></p>
+</div>
+<div class="card">
+<h4>Search Members</h4>
+<input type="text" id="member-search" placeholder="Search by name or membership number..." style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 8px; margin-bottom: 1rem;">
+</div>
+<div id="directory-list">
+<!-- Member directory will be loaded here -->
+</div>
+</div>
+<!-- Documents Section -->
+<div id="documents" class="content-section">
+<div class="card">
+<h3>📄 Community Documents</h3>
+<p>Important documents and resources for the community.</p>
+</div>
+<!-- Admin: Add Document -->
+<div id="document-form" class="card admin-only" style="display: none;">
+<h3>Add New Document</h3>
+<form id="new-document-form">
+<div class="form-group">
+<label for="document-title">Document Title *</label>
+<input type="text" id="document-title" placeholder="Document name" required>
+</div>
+<div class="form-group">
+<label for="document-description">Description</label>
+<textarea id="document-description" rows="3" placeholder="Document description (optional)"></textarea>
+</div>
+<div class="form-group">
+<label for="document-file">Document Link</label>
+<input type="url" id="document-file" placeholder="https://example.com/document.pdf" required>
+</div>
+<button type="submit" class="btn btn-secondary">Add Document</button>
+</form>
+</div>
+<!-- Documents List -->
+<div id="documents-list">
+<!-- Documents will be loaded here -->
+</div>
+</div>
+<!-- Admin Section -->
+<div id="admin-section" class="content-section">
+<div class="card">
+<h3>⚙️ Admin Dashboard</h3>
+<p>Manage your community centre's digital presence.</p>
+</div>
+<!-- Quick Stats -->
+<div class="admin-settings">
+<h4>Community Statistics</h4>
+<div class="settings-grid">
+<div class="card">
+<h5>Total Members</h5>
+<div id="stats-members" style="font-size: 2rem; color: var(--primary-red);">0</div>
+</div>
+<div class="card">
+<h5>Total Announcements</h5>
+<div id="stats-announcements" style="font-size: 2rem; color: var(--primary-red);">0</div>
+</div>
+<div class="card">
+<h5>Upcoming Events</h5>
+<div id="stats-events" style="font-size: 2rem; color: var(--primary-red);">0</div>
+</div>
+</div>
+</div>
+<!-- Data Management -->
+<div class="card">
+<h4>Data Management</h4>
+<p>Backup and manage your community data.</p>
+<div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+<button class="btn btn-secondary" onclick="exportData()">
+<i data-lucide="download"></i> Export Data
+</button>
+<button class="btn btn-danger" onclick="clearAllData()">
+<i data-lucide="trash-2"></i> Clear All Data
+</button>
+</div>
+</div>
+</div>
+<!-- Scripts -->
+<script>
+// Reyatsotella Community Centre - Fixed Secure App JavaScript
+class ReyaCommunityApp {
+constructor() {
+this.currentUser = null;
+this.isAdmin = false;
+this.members = [];
+this.announcements = [];
+this.events = [];
+this.messages = [];
+this.documents = [];
+this.comments = [];
+this.init();
+}
+init() {
+// Initialize Lucide icons
+if (typeof lucide !== 'undefined') {
+lucide.createIcons();
+}
+// Load data from localStorage
+this.loadData();
+// Check if user is logged in
+this.checkUserSession();
+// Setup event listeners
+this.setupEventListeners();
+// Setup PWA features
+this.setupPWA();
+// Hide loading screen
+setTimeout(() => {
+document.getElementById('loading-screen').style.display = 'none';
+}, 2000);
+// Update status indicator
+this.updateOnlineStatus();
+// Load content
+this.loadContent();
+}
+setupEventListeners() {
+// Authentication forms
+document.getElementById('login-form').addEventListener('submit', (e) => this.handleLogin(e));
+document.getElementById('admin-form').addEventListener('submit', (e) => this.handleAdminLogin(e));
+document.getElementById('register-form').addEventListener('submit', (e) => this.handleRegistration(e));
+// Content forms
+document.getElementById('new-announcement-form').addEventListener('submit', (e) => this.handleNewAnnouncement(e));
+document.getElementById('new-event-form').addEventListener('submit', (e) => this.handleNewEvent(e));
+document.getElementById('new-message-form').addEventListener('submit', (e) => this.handleNewMessage(e));
+document.getElementById('new-document-form').addEventListener('submit', (e) => this.handleNewDocument(e));
+// Search
+document.getElementById('member-search').addEventListener('input', (e) => this.searchMembers(e.target.value));
+// Online status
+window.addEventListener('online', () => this.updateOnlineStatus());
+window.addEventListener('offline', () => this.updateOnlineStatus());
+}
+setupPWA() {
+if ('serviceWorker' in navigator) {
+navigator.serviceWorker.register('sw.js').catch(console.error);
+}
+}
+updateOnlineStatus() {
+const indicator = document.getElementById('status-indicator');
+const icon = document.getElementById('status-icon');
+const text = document.getElementById('status-text');
+if (navigator.onLine) {
+indicator.className = 'status-indicator status-online';
+icon.textContent = '🌐';
+text.textContent = 'Online - Data syncing';
+} else {
+indicator.className = 'status-indicator status-offline';
+icon.textContent = '📱';
+text.textContent = 'Offline Mode - Data will sync when online';
+}
+}
+checkUserSession() {
+const session = localStorage.getItem('reyaUserSession');
+if (session) {
+const userData = JSON.parse(session);
+if (userData.type === 'admin') {
+this.loginAsAdmin();
+} else if (userData.member) {
+this.loginAsMember(userData.member);
+}
+}
+}
+handleLogin(e) {
+e.preventDefault();
+const membershipNumber = document.getElementById('login-membership').value.trim();
+const phone = document.getElementById('login-phone').value.trim();
+const member = this.members.find(m => 
+m.membershipNumber === membershipNumber && m.phone === phone
+);
+if (member) {
+this.loginAsMember(member);
+this.showAlert('Login successful! Welcome back.', 'success');
+} else {
+this.showAlert('Invalid credentials. Please check your membership number and phone number.', 'error');
+}
+}
+handleAdminLogin(e) {
+e.preventDefault();
+const username = document.getElementById('admin-username').value.trim();
+const password = document.getElementById('admin-password').value;
+// Simple admin authentication
+if (username === 'reyatsotella-admin' && password === 'Reyatsotella2025!') {
+this.loginAsAdmin();
+this.showAlert('Admin login successful!', 'success');
+} else {
+this.showAlert('Invalid admin credentials.', 'error');
+}
+}
+handleRegistration(e) {
+e.preventDefault();
+const formData = {
+name: document.getElementById('reg-name').value.trim(),
+membershipNumber: document.getElementById('reg-membership-number').value.trim(),
+phone: document.getElementById('reg-phone').value.trim(),
+address: document.getElementById('reg-address').value.trim(),
+emergencyContact: document.getElementById('reg-emergency-contact').value.trim()
+};
+// Check if membership number already exists
+const existing = this.members.find(m => m.membershipNumber === formData.membershipNumber);
+if (existing) {
+this.showAlert('This membership number is already registered.', 'error');
+return;
+}
+// Add new member
+const member = {
+id: 'member_' + Date.now(),
+...formData,
+registeredAt: Date.now(),
+status: 'active'
+};
+this.members.push(member);
+this.saveData();
+this.showAlert('Registration successful! You can now login.', 'success');
+// Clear form
+document.getElementById('register-form').reset();
+// Switch to login tab
+this.showAuthForm('login');
+}
+loginAsMember(member) {
+this.currentUser = member;
+this.isAdmin = false;
+// Update UI
+document.getElementById('auth').style.display = 'none';
+document.getElementById('user-welcome').classList.remove('hidden');
+document.getElementById('user-name-display').textContent = member.name;
+// Save session
+localStorage.setItem('reyaUserSession', JSON.stringify({
+type: 'member',
+member: member
+}));
+}
+loginAsAdmin() {
+this.currentUser = { name: 'Administrator', type: 'admin' };
+this.isAdmin = true;
+// Update UI
+document.getElementById('auth').style.display = 'none';
+document.getElementById('admin-welcome').classList.remove('hidden');
+// Show admin features
+document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+// Save session
+localStorage.setItem('reyaUserSession', JSON.stringify({
+type: 'admin'
+}));
+}
+logout() {
+this.currentUser = null;
+this.isAdmin = false;
+// Clear session
+localStorage.removeItem('reyaUserSession');
+// Reset UI
+document.getElementById('auth').style.display = 'block';
+document.getElementById('user-welcome').classList.add('hidden');
+document.getElementById('admin-welcome').classList.add('hidden');
+document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+// Clear forms
+document.querySelectorAll('form').forEach(form => form.reset());
+// Show auth section
+this.showAuthForm('login');
+}
+// Data management
+loadData() {
+this.members = JSON.parse(localStorage.getItem('reyaMembers') || '[]');
+this.announcements = JSON.parse(localStorage.getItem('reyaAnnouncements') || '[]');
+this.events = JSON.parse(localStorage.getItem('reyaEvents') || '[]');
+this.messages = JSON.parse(localStorage.getItem('reyaMessages') || '[]');
+this.documents = JSON.parse(localStorage.getItem('reyaDocuments') || '[]');
+this.comments = JSON.parse(localStorage.getItem('reyaComments') || '[]');
+// Initialize with sample data if empty
+if (this.announcements.length === 0) {
+this.announcements.push({
+id: 'ann1',
+title: 'Welcome to Reyatsotella Community App',
+content: 'Welcome to our new community application! This app will help us stay connected and share important information. Please register and start using the features.',
+date: Date.now(),
+author: 'System',
+approved: true
+});
+}
+}
+saveData() {
+localStorage.setItem('reyaMembers', JSON.stringify(this.members));
+localStorage.setItem('reyaAnnouncements', JSON.stringify(this.announcements));
+localStorage.setItem('reyaEvents', JSON.stringify(this.events));
+localStorage.setItem('reyaMessages', JSON.stringify(this.messages));
+localStorage.setItem('reyaDocuments', JSON.stringify(this.documents));
+localStorage.setItem('reyaComments', JSON.stringify(this.comments));
+}
+loadContent() {
+this.loadAnnouncements();
+this.loadEvents();
+this.loadMessages();
+this.loadDocuments();
+this.loadDirectory();
+this.loadStats();
+}
+showAlert(message, type = 'info') {
+const alertDiv = document.createElement('div');
+alertDiv.className = `alert alert-${type}`;
+alertDiv.innerHTML = `
+<i data-lucide="alert-circle"></i>
+${message}
+`;
+const container = document.querySelector('.content-section.active') || document.body;
+container.insertBefore(alertDiv, container.firstChild);
+if (typeof lucide !== 'undefined') {
+lucide.createIcons();
+}
+setTimeout(() => alertDiv.remove(), 5000);
+}
+// Content Management
+loadAnnouncements() {
+this.announcements.sort((a, b) => b.date - a.date);
+const container = document.getElementById('announcements-list');
+container.innerHTML = '';
+if (this.announcements.length === 0) {
+container.innerHTML = '<div class="card"><p>No announcements yet.</p></div>';
+return;
+}
+for (const announcement of this.announcements) {
+const announcementDiv = document.createElement('div');
+announcementDiv.className = 'card';
+announcementDiv.innerHTML = `
+<h3>${announcement.title}</h3>
+<div class="card-meta">Posted on ${new Date(announcement.date).toLocaleDateString()} by ${announcement.author}</div>
+<p>${announcement.content}</p>
+<div class="comment-actions">
+<button class="btn btn-secondary" onclick="toggleComments('${announcement.id}')">
+<i data-lucide="message-circle"></i> Comments (<span id="comment-count-${announcement.id}">0</span>)
+</button>
+</div>
+<div id="comments-${announcement.id}" class="hidden" style="margin-top: 1rem;">
+<div class="card">
+<h4>Comments</h4>
+<div id="comments-list-${announcement.id}">
+<!-- Comments will be loaded here -->
+</div>
+${this.currentUser && !this.isAdmin ? `
+<form id="comment-form-${announcement.id}" onsubmit="app.addCommentToAnnouncement('${announcement.id}', event)" style="margin-top: 1rem;">
+<div class="form-group">
+<label>Add Comment</label>
+<textarea id="comment-text-${announcement.id}" rows="2" placeholder="Share your thoughts..." required></textarea>
+</div>
+<button type="submit" class="btn btn-primary">Post Comment</button>
+</form>
+` : ''}
+</div>
+</div>
+`;
+container.appendChild(announcementDiv);
+// Load comments count
+this.loadCommentsCount(announcement.id);
+}
+if (typeof lucide !== 'undefined') {
+lucide.createIcons();
+}
+}
+loadCommentsCount(announcementId) {
+const announcementComments = this.comments.filter(c => c.announcementId === announcementId);
+const countElement = document.getElementById(`comment-count-${announcementId}`);
+if (countElement) {
+countElement.textContent = announcementComments.length;
+}
+}
+loadComments(announcementId) {
+const announcementComments = this.comments.filter(c => c.announcementId === announcementId);
+announcementComments.sort((a, b) => a.date - b.date);
+const container = document.getElementById(`comments-list-${announcementId}`);
+container.innerHTML = '';
+if (announcementComments.length === 0) {
+container.innerHTML = '<p>No comments yet.</p>';
+return;
+}
+for (const comment of announcementComments) {
+const commentDiv = document.createElement('div');
+commentDiv.className = 'comment';
+commentDiv.innerHTML = `
+<div class="comment-author">${comment.authorName}</div>
+<div class="comment-content">${comment.content}</div>
+<div class="comment-time">${new Date(comment.date).toLocaleString()}</div>
+${this.isAdmin ? `
+<div class="comment-actions" style="margin-top: 0.5rem;">
+<button class="btn btn-danger" onclick="app.deleteComment('${comment.id}', '${announcementId}')">
+<i data-lucide="trash-2"></i> Delete
+</button>
+</div>
+` : ''}
+`;
+container.appendChild(commentDiv);
+}
+}
+addCommentToAnnouncement(announcementId, event) {
+event.preventDefault();
+if (!this.currentUser || this.isAdmin) return;
+const commentText = document.getElementById(`comment-text-${announcementId}`).value.trim();
+if (!commentText) return;
+const comment = {
+id: 'comment_' + Date.now(),
+announcementId: announcementId,
+content: commentText,
+authorId: this.currentUser.id,
+authorName: this.currentUser.name,
+date: Date.now(),
+approved: true
+};
+this.comments.push(comment);
+this.saveData();
+document.getElementById(`comment-text-${announcementId}`).value = '';
+this.loadComments(announcementId);
+this.loadCommentsCount(announcementId);
+this.showAlert('Comment posted successfully!', 'success');
+}
+deleteComment(commentId, announcementId) {
+if (!this.isAdmin) return;
+this.comments = this.comments.filter(c => c.id !== commentId);
+this.saveData();
+this.loadComments(announcementId);
+this.loadCommentsCount(announcementId);
+this.showAlert('Comment deleted.', 'success');
+}
+loadEvents() {
+this.events.sort((a, b) => a.date - b.date);
+const container = document.getElementById('events-list');
+container.innerHTML = '';
+if (this.events.length === 0) {
+container.innerHTML = '<div class="card"><p>No events scheduled yet.</p></div>';
+return;
+}
+for (const event of this.events) {
+const eventDiv = document.createElement('div');
+eventDiv.className = 'card';
+eventDiv.innerHTML = `
+<h3>${event.title}</h3>
+<div class="card-meta">
+<i data-lucide="calendar"></i> ${new Date(event.date).toLocaleString()}
+<br>
+<i data-lucide="map-pin"></i> ${event.location}
+</div>
+<p>${event.description}</p>
+${this.isAdmin ? `
+<div class="comment-actions">
+<button class="btn btn-danger" onclick="app.deleteEvent('${event.id}')">
+<i data-lucide="trash-2"></i> Delete
+</button>
+</div>
+` : ''}
+`;
+container.appendChild(eventDiv);
+}
+if (typeof lucide !== 'undefined') {
+lucide.createIcons();
+}
+}
+loadMessages() {
+this.messages.sort((a, b) => b.date - a.date);
+const container = document.getElementById('messages-list');
+container.innerHTML = '';
+if (this.messages.length === 0) {
+container.innerHTML = '<div class="card"><p>No messages yet.</p></div>';
+return;
+}
+for (const message of this.messages) {
+const messageDiv = document.createElement('div');
+messageDiv.className = 'card';
+messageDiv.innerHTML = `
+<h3>${message.title}</h3>
+<div class="card-meta">Sent on ${new Date(message.date).toLocaleDateString()}</div>
+<p>${message.content}</p>
+${this.isAdmin ? `
+<div class="comment-actions">
+<button class="btn btn-danger" onclick="app.deleteMessage('${message.id}')">
+<i data-lucide="trash-2"></i> Delete
+</button>
+</div>
+` : ''}
+`;
+container.appendChild(messageDiv);
+}
+}
+loadDocuments() {
+const container = document.getElementById('documents-list');
+container.innerHTML = '';
+if (this.documents.length === 0) {
+container.innerHTML = '<div class="card"><p>No documents available yet.</p></div>';
+return;
+}
+for (const document of this.documents) {
+const documentDiv = document.createElement('div');
+documentDiv.className = 'card';
+documentDiv.innerHTML = `
+<h3>${document.title}</h3>
+${document.description ? `<p>${document.description}</p>` : ''}
+<div class="comment-actions">
+<a href="${document.fileUrl}" target="_blank" class="btn btn-primary">
+<i data-lucide="external-link"></i> View Document
+</a>
+${this.isAdmin ? `
+<button class="btn btn-danger" onclick="app.deleteDocument('${document.id}')">
+<i data-lucide="trash-2"></i> Delete
+</button>
+` : ''}
+</div>
+`;
+container.appendChild(documentDiv);
+}
+if (typeof lucide !== 'undefined') {
+lucide.createIcons();
+}
+}
+loadDirectory() {
+this.members.sort((a, b) => a.name.localeCompare(b.name));
+const container = document.getElementById('directory-list');
+this.renderDirectory(this.members, container);
+}
+renderDirectory(members, container) {
+container.innerHTML = '';
+if (members.length === 0) {
+container.innerHTML = '<div class="card"><p>No members registered yet.</p></div>';
+return;
+}
+for (const member of members) {
+const memberDiv = document.createElement('div');
+memberDiv.className = 'member-card';
+memberDiv.innerHTML = `
+<div class="member-info">
+<h4>${member.name}</h4>
+<div class="member-meta">Member: ${member.membershipNumber}</div>
+<div class="member-meta">Registered: ${new Date(member.registeredAt).toLocaleDateString()}</div>
+</div>
+<div class="contact-info">
+${this.isAdmin ? `
+<div><strong>Phone:</strong> ${member.phone}</div>
+${member.address ? `<div><strong>Address:</strong> ${member.address}</div>` : ''}
+${member.emergencyContact ? `<div><strong>Emergency:</strong> ${member.emergencyContact}</div>` : ''}
+` : `
+<em>Contact details protected</em>
+`}
+</div>
+`;
+container.appendChild(memberDiv);
+}
+}
+searchMembers(query) {
+if (!query.trim()) {
+this.renderDirectory(this.members, document.getElementById('directory-list'));
+return;
+}
+const searchTerm = query.toLowerCase();
+const filteredMembers = this.members.filter(member => 
+member.name.toLowerCase().includes(searchTerm) ||
+member.membershipNumber.toLowerCase().includes(searchTerm)
+);
+this.renderDirectory(filteredMembers, document.getElementById('directory-list'));
+}
+loadStats() {
+if (!this.isAdmin) return;
+document.getElementById('stats-members').textContent = this.members.length;
+document.getElementById('stats-announcements').textContent = this.announcements.length;
+document.getElementById('stats-events').textContent = this.events.filter(e => e.date > Date.now()).length;
+}
+// Form Handlers
+handleNewAnnouncement(e) {
+e.preventDefault();
+if (!this.isAdmin) return;
+const title = document.getElementById('announcement-title').value.trim();
+const content = document.getElementById('announcement-content').value.trim();
+const announcement = {
+id: 'ann_' + Date.now(),
+title,
+content,
+date: Date.now(),
+author: 'Administrator',
+approved: true
+};
+this.announcements.push(announcement);
+this.saveData();
+this.loadAnnouncements();
+this.loadStats();
+document.getElementById('new-announcement-form').reset();
+this.showAlert('Announcement posted successfully!', 'success');
+}
+handleNewEvent(e) {
+e.preventDefault();
+if (!this.isAdmin) return;
+const title = document.getElementById('event-title').value.trim();
+const date = new Date(document.getElementById('event-date').value).getTime();
+const location = document.getElementById('event-location').value.trim();
+const description = document.getElementById('event-description').value.trim();
+const event = {
+id: 'event_' + Date.now(),
+title,
+date,
+location,
+description,
+createdBy: 'Administrator'
+};
+this.events.push(event);
+this.saveData();
+this.loadEvents();
+this.loadStats();
+document.getElementById('new-event-form').reset();
+this.showAlert('Event created successfully!', 'success');
+}
+handleNewMessage(e) {
+e.preventDefault();
+if (!this.isAdmin) return;
+const title = document.getElementById('message-title').value.trim();
+const content = document.getElementById('message-content').value.trim();
+const message = {
+id: 'msg_' + Date.now(),
+title,
+content,
+date: Date.now(),
+sentBy: 'Administrator'
+};
+this.messages.push(message);
+this.saveData();
+this.loadMessages();
+document.getElementById('new-message-form').reset();
+this.showAlert('Message sent successfully!', 'success');
+}
+handleNewDocument(e) {
+e.preventDefault();
+if (!this.isAdmin) return;
+const title = document.getElementById('document-title').value.trim();
+const description = document.getElementById('document-description').value.trim();
+const fileUrl = document.getElementById('document-file').value.trim();
+const document = {
+id: 'doc_' + Date.now(),
+title,
+description,
+fileUrl,
+addedBy: 'Administrator',
+addedDate: Date.now()
+};
+this.documents.push(document);
+this.saveData();
+this.loadDocuments();
+document.getElementById('new-document-form').reset();
+this.showAlert('Document added successfully!', 'success');
+}
+// Utility Methods
+deleteEvent(eventId) {
+if (!this.isAdmin) return;
+this.events = this.events.filter(e => e.id !== eventId);
+this.saveData();
+this.loadEvents();
+this.loadStats();
+this.showAlert('Event deleted.', 'success');
+}
+deleteMessage(messageId) {
+if (!this.isAdmin) return;
+this.messages = this.messages.filter(m => m.id !== messageId);
+this.saveData();
+this.loadMessages();
+this.showAlert('Message deleted.', 'success');
+}
+deleteDocument(documentId) {
+if (!this.isAdmin) return;
+this.documents = this.documents.filter(d => d.id !== documentId);
+this.saveData();
+this.loadDocuments();
+this.showAlert('Document deleted.', 'success');
+}
+exportData() {
+const data = {
+members: this.members,
+announcements: this.announcements,
+events: this.events,
+messages: this.messages,
+documents: this.documents
+};
+const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = `reya-community-backup-${new Date().toISOString().split('T')[0]}.json`;
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+URL.revokeObjectURL(url);
+this.showAlert('Data exported successfully!', 'success');
+}
+clearAllData() {
+if (!confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
+return;
+}
+this.members = [];
+this.announcements = [];
+this.events = [];
+this.messages = [];
+this.documents = [];
+this.comments = [];
+localStorage.clear();
+// Re-initialize with sample data
+this.loadData();
+this.loadContent();
+this.showAlert('All data cleared successfully!', 'success');
+}
+}
+// Global functions
+let app;
+function showSection(sectionId) {
+// Hide all sections
+document.querySelectorAll('.content-section').forEach(section => {
+section.classList.remove('active');
+});
+// Remove active class from all tabs
+document.querySelectorAll('.nav-tab').forEach(tab => {
+tab.classList.remove('active');
+});
+// Show selected section
+document.getElementById(sectionId).classList.add('active');
+// Add active class to clicked tab
+document.querySelector(`[data-tab="${sectionId}"]`).classList.add('active');
+}
+function showAuthForm(formType) {
+// Hide all auth forms
+document.querySelectorAll('.auth-form').forEach(form => {
+form.classList.remove('active');
+});
+// Remove active class from all auth tabs
+document.querySelectorAll('.auth-container .nav-tab').forEach(tab => {
+tab.classList.remove('active');
+});
+// Show selected form
+document.getElementById(formType).classList.add('active');
+// Add active class to clicked tab
+event.target.classList.add('active');
+}
+function toggleComments(announcementId) {
+const commentsSection = document.getElementById(`comments-${announcementId}`);
+if (commentsSection) {
+commentsSection.classList.toggle('hidden');
+if (!commentsSection.classList.contains('hidden')) {
+app.loadComments(announcementId);
+}
+}
+}
+function scrollToPostForm() {
+const form = document.getElementById('announcement-form');
+if (form) {
+form.scrollIntoView({ behavior: 'smooth' });
+}
+}
+function logout() {
+if (app) {
+app.logout();
+}
+}
+// Initialize app when page loads
+document.addEventListener('DOMContentLoaded', () => {
+app = new ReyaCommunityApp();
+});
+</script>
 </body>
 </html>
